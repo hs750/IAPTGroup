@@ -9,3 +9,5 @@ web2py/parameters_8000.py
 web2py/applications/welcome/**
 web2py/applications/admin/**
 web2py/applications/examples/**
+
+web2py/welcome.w2p
