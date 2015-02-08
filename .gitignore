@@ -1,10 +1,7 @@
-**\errors
-**\sessions
 *.log
 *.pid
-**\.idea
+**/.idea
 **/errors
 **/sessions
-.idea/workspace.xml
 web2py/httpserver.pid
 web2py/parameters_8000.py
