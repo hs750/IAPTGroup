@@ -7,3 +7,5 @@
 web2py/httpserver.pid
 web2py/parameters_8000.py
 web2py/applications/welcome/**
+web2py/applications/admin/**
+web2py/applications/examples/**
