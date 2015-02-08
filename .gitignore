@@ -1,7 +1,9 @@
 *.log
 *.pid
+*.pyc
 **/.idea
 **/errors
 **/sessions
 web2py/httpserver.pid
 web2py/parameters_8000.py
+web2py/applications/welcome/**
