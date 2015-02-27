@@ -5,6 +5,10 @@ db = DAL('sqlite://IAPT_DB.db')
 auth = Auth(db) #TODO Dave to sort authentication
 auth.define_tables(username=True,signature=False)
 
+# System State Constants
+projectStates = ['open', 'closed']
+documentStates = ['open', 'completed']
+contributionStates = ['pending', 'accepted', 'rejected']
 
 db.define_table(
     'projects',
