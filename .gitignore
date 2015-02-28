@@ -1,10 +1,13 @@
 *.log
 *.pid
 *.pyc
-**/databases
+
 **/.idea
-**/errors
-**/sessions
+
+web2py/applications/Vesuvius/databases
+web2py/applications/Vesuvius/errors
+web2py/applications/Vesuvius/sessions
+
 web2py/httpserver.pid
 web2py/parameters_8000.py
 web2py/applications/welcome/**
