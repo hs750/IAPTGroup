@@ -5,9 +5,9 @@
 
 **/.idea
 
-**/databases
-**/errors
-**/sessions
+applications/Vesuvius/databases
+applications/Vesuvius/errors
+applications/Vesuvius/sessions
 
 web2py/httpserver.pid
 web2py/parameters_8000.py
