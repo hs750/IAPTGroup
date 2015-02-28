@@ -1,6 +1,7 @@
 *.log
 *.pid
 *.pyc
+*.bak
 
 **/.idea
 
