@@ -53,6 +53,16 @@ def index():
     return dict(new=newest, topFive=topFive)
 
 
+# TODO : content here
+def create():
+    return index()
+
+def dashboard():
+    return index()
+
+def browse():
+    return index()
+
 def user():
     """
     exposes:
