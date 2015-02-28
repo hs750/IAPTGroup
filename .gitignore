@@ -5,14 +5,14 @@
 
 **/.idea
 
-web2py/applications/Vesuvius/databases
-web2py/applications/Vesuvius/errors
-web2py/applications/Vesuvius/sessions
+**/databases
+**/errors
+**/sessions
 
 web2py/httpserver.pid
 web2py/parameters_8000.py
-web2py/applications/welcome/**
-web2py/applications/admin/**
-web2py/applications/examples/**
+applications/welcome/**
+applications/admin/**
+applications/examples/**
 
 web2py/welcome.w2p
