@@ -8,20 +8,28 @@
     width: 50%;
 }
 .projectsListItem{
-    min-height: 150px;
+    /*min-height: 150px;*/
     height: auto;
     clear: both;
     padding-bottom: 10px;
+    overflow: auto;
 }
 .projImgCol{
+    width: 24%;
+    max-width: 200px;
     float:left;
     text-align: center;
  }
 
+.projImgCol img {
+    width: 100%;
+}
+
 .projInfoCol{
-    float: right;
-    width: 75%;
+    float: left;
+    width: 74%;
     height: 100%;
+    padding-left: 2%;
 }
 
 .projInfoCol h4 {
