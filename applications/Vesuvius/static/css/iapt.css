@@ -1,0 +1,29 @@
+.homeProjLeft {
+    float: left;
+    width: 50%;
+}
+
+.homeProjRight {
+    float: right;
+    width: 50%;
+}
+.projectsListItem{
+    min-height: 150px;
+    height: auto;
+    clear: both;
+    padding-bottom: 10px;
+}
+.projImgCol{
+    float:left;
+    text-align: center;
+ }
+
+.projInfoCol{
+    float: right;
+    width: 75%;
+    height: 100%;
+}
+
+.projInfoCol h4 {
+    margin-top: 1px;
+}
