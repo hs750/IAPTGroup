@@ -1,0 +1,13 @@
+{{extend 'layout.html'}}
+{{if response.flash:}}
+<div class="alert alert-warn">{{=response.flash}}</div>
+{{pass}}
+
+<div class="container" id="login-form">
+    <h3>
+        If you already have a Vesuvius account, sign in below
+    </h3>
+    {{=form}}
+
+    Don't have an account? <a href="{{=URL('user','create')}}">Sign up</a>
+</div>

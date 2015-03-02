@@ -6,12 +6,7 @@
 if request.args(0)=='register' and not session.auth_2_factor_user:
     redirect(URL('user','create'))
 elif request.args(0)=='login' and not session.auth_2_factor_user:
-    if not 'register' in auth.settings.actions_disabled:
-        form.add_button(T('Register'),URL(args='register', vars={'_next': request.vars._next} if request.vars._next else None),_class='btn')
-    pass
-    if not 'request_reset_password' in auth.settings.actions_disabled:
-        form.add_button(T('Lost Password'),URL(args='request_reset_password'),_class='btn')
-    pass
+    redirect(URL('user','login'))
 pass
 =form
 }}
