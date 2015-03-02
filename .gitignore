@@ -4,11 +4,12 @@
 *.bak
 
 **/.idea
+*.DS_Store
 
 applications/Vesuvius/databases
 applications/Vesuvius/errors
 applications/Vesuvius/sessions
-applications/Vesuvios/uploads
+applications/Vesuvius/uploads
 
 web2py/httpserver.pid
 web2py/parameters_8000.py
