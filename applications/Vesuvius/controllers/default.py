@@ -65,7 +65,9 @@ def dashboard():
     return index()
 
 def browse():
-    return index()
+    projects = db(db.projects.state == projectStates[0]).select()
+    projects = addImagesToProjects(projects, db)
+    return dict(projects=projects)
 
 def user():
     """
