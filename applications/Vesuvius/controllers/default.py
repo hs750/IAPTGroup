@@ -9,6 +9,7 @@
 ## - api is an example of Hypermedia API support and access control
 #########################################################################
 from operator import itemgetter
+from IAPTlib import addImagesToProjects
 
 def index():
 
@@ -49,6 +50,9 @@ def index():
         topFiveIDs.append(projPercentateComplete[i][0])
 
     topFive = db(db.projects.id.belongs(topFiveIDs)).select()
+
+    newest = addImagesToProjects(newest, db)
+    topFive = addImagesToProjects(topFive, db)
 
     return dict(new=newest, topFive=topFive)
 
@@ -111,3 +115,11 @@ def api():
         '<tablename>': {'GET':{},'POST':{},'PUT':{},'DELETE':{}},
         }
     return Collection(db).process(request,response,rules)
+
+def getImage():
+    """
+    Get an image. Which image to get is stored in request.
+    This method should only be called as part of a URL for displaying images on the page
+    :return: the  image
+    """
+    return response.download(request, db)

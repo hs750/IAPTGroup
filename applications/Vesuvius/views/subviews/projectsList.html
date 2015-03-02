@@ -1,0 +1,9 @@
+<div class="projectsList">
+{{for project in projects:}}
+    <div class="projectsListItem">
+        {{=H3(project.title)}}
+        {{=DIV(project.description)}}
+        {{=IMG(_src=URL('default', 'getImage', args=[project.image]), _alt=project.imageAlt, _width=100, _height=100)}}
+    </div>
+{{pass}}
+</div>
