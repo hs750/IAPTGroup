@@ -1,0 +1,13 @@
+{{extend 'layout.html'}}
+
+{{=H2(project.title)}}
+{{=B(I('Submitted by: ' + owner.username))}}
+{{=DIV(project.description)}}
+
+{{for doc in docs:}}
+    <div class="projDocDiv">
+        {{=H3(doc.title)}}
+        {{=IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description)}}
+        {{=DIV(A('Transcribe', _href=URL('project', 'transcribe', vars=dict(id=doc.id)), _class='btn btn-primary'))}}
+    </div>
+{{pass}}

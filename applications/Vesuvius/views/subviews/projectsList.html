@@ -3,7 +3,7 @@
         <div class="projectsListItem">
             <div class="projImgCol">
                 {{=IMG(_src=URL('default', 'getImage', args=[project.image]), _alt=project.imageAlt)}}
-                {{=DIV(A('View', _href=URL('default', 'viewProject', vars=dict(id=project.id)), _class='btn btn-primary'))}}
+                {{=DIV(A('View', _href=URL('project', 'view', vars=dict(id=project.id)), _class='btn btn-primary'))}}
             </div>
             <div class="projInfoCol">
                 {{=H4(project.title)}}
