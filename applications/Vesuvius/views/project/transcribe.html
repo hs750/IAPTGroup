@@ -1,0 +1,18 @@
+{{extend 'layout.html'}}
+        <div>
+            Transcribe the document in the text area below. You can navigate through the images by using the arrow keys below, and enlarge any image by clicking on it. When you're finished transcribing, please press the submit button.
+        </div>
+        <div class="transContent">
+        {{=H2(doc.title)}}
+        {{=DIV(doc.description)}}
+        <div>
+            {{=DIV(IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description), _class='transImg')}}
+            {{=DIV(form, _class='transForm')}}
+        </div>
+        </div>
+
+        <div class="transFoot">
+            {{=DIV('Document ' + str(currentDoc) + ' of ' + str(totalDocs))}}
+            {{=A(SPAN('Previous'), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docPrevArrow')}}
+            {{=A(SPAN('Next'), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docNextArrow')}}
+        </div>
