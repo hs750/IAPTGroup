@@ -14,8 +14,8 @@ db.define_table(
     'projects',
     Field('title', 'string', requires=IS_NOT_EMPTY()),
     Field('description', 'text'),
-    Field('state', 'string'),
-    Field('userID', db.auth_user)
+    Field('state', 'string', writable=False, readable=False),
+    Field('userID', db.auth_user, writable=False, readable=False)
 )
 
 requirementTypes = ['Short Text', 'Long Text', 'Date', 'Number']

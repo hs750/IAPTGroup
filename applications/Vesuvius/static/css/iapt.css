@@ -40,3 +40,7 @@
     text-align: center;
     width: 15%;
 }
+
+.createProjForm {
+    float: left;
+}

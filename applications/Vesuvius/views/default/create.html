@@ -1,6 +1,18 @@
 {{extend 'layout.html'}}
 <h2>
-    Test Title
+    Create a new project
 </h2>
-{{=new}}
-{{=topFive}}
+<div>To create a new project, please fill in the required fields below</div><br>
+{{=projform.custom.begin}}
+<div id="createProjForm">
+    <div><b>Title </b>{{=projform.custom.widget.title}}</div>
+    <div><i>A short title for your project</i></div><br>
+    <div><b>Description </b>{{=projform.custom.widget.description}}</div>
+    <div><i>You can make the description as detailed as you like. It's purpose is to give people an introduction to the project.</i></div><br>
+    <div><b>Keywords </b>{{=projform.custom.widget.keyword}}</div>
+    <div><i>Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas.</i></div><br>
+    <div><b>Requirements {{=projform.custom.widget.name}}</b></div>
+    <div><i>What do you require of people transcribing your documents? For example this can be 'date' or 'author' or 'full transcription'</i></div><br>
+    <div>{{=projform.custom.submit}}</div>
+{{=projform.custom.end}}
+</div>

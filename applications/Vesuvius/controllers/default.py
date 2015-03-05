@@ -58,8 +58,24 @@ def index():
 
 
 # TODO : content here
+## @auth.requires_login()
 def create():
-    return index()
+    
+    #define the project form structure with all fields and validation
+    projform = SQLFORM.factory(db.projects, db.keywords, db.requirements)
+    if projform.accepts(request,session):
+        ##insert into projects table
+        db.projects.insert(title=request.vars.title, description=request.vars.description, state='open', userID=auth.user.id)
+        ##insert keywords into keywords table
+        db.keywords.insert(keyword=request.vars.keyword)
+        ##insert the requirements into the requirements table
+        ##unsure how to do the requirements type reading from the form?
+        db.requirements.insert(name=request.vars.name, projectID=request.vars.id)
+        db.commit
+        response.flash = 'You have successfully created a project'
+    elif projform.errors:
+        response.flash = 'One or more of your fields have errors. See below for more information'
+    return dict(projform=projform)
 
 def dashboard():
     return index()
