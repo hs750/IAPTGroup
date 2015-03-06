@@ -1,0 +1,28 @@
+{{left_sidebar_enabled,right_sidebar_enabled=False,('message' in globals())}}
+{{extend 'bootup-layout.html'}}
+<h3>Sign Up</h3>
+
+<div class="signupone">
+<h4>Your Details</h4>
+<p>Please give us some basic details about yourself. <br>
+Don't Worry! - Only your Username will be displayed to the world!</p>
+<div id="firstform">
+{{=LOAD('register', 'registerPartOne.load', ajax=True ,target='firstform')}}
+</div>
+</div>
+
+<div class="signuptwo hidden">
+<h4>Your Address</h4>
+<p> Next we need to know where to deliver your goodies to!</p>
+<div id="secondform">
+{{=LOAD('register', 'registerPartTwo.load', ajax=True, target='secondform')}}
+</div>
+</div>
+
+<div class="signupthree hidden">
+<h4>Your Card Details</h4>
+<p> Finally, your card details to process payments.</p>
+<div id="thirdform">
+{{=LOAD('register', 'registerPartThree.load', ajax=True, ajax_trap=False, target='thirdform')}}
+</div>
+</div>
