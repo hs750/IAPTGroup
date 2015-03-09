@@ -10,6 +10,7 @@
 #########################################################################
 from operator import itemgetter
 from IAPTlib import addImagesToProjects
+from IAPTlib import searchProjects
 
 def index():
 
@@ -81,9 +82,23 @@ def dashboard():
     return index()
 
 def browse():
-    projects = db(db.projects.state == projectStates[0]).select()
-    projects = addImagesToProjects(projects, db)
-    return dict(projects=projects)
+    if request.vars.search is None:
+        searchTerms = ''
+    else:
+        searchTerms = request.vars.search
+    print searchTerms
+    results = searchProjects(searchTerms, db)
+    searchForm = FORM(INPUT(_type='search', _placeholder='Search', _name='searchField'),
+                      INPUT(_type='submit', _value='Search', _name='searchSubmit'),
+                      _name='searchForm',
+                      _class='form-inline',
+                      _id='searchForm')
+
+    if searchForm.accepts(request.post_vars):
+        redirect(URL(vars=dict(search=request.post_vars.searchField)))
+
+    results = addImagesToProjects(results, db)
+    return dict(form=searchForm, projects=results)
 
 def user():
     """

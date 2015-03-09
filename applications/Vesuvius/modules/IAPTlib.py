@@ -16,3 +16,13 @@ def addImagesToProjects(projectSet, db):
         proj['image'] = docImg[0].image
         proj['imageAlt'] = 'Image of: ' + docImg[0].title
     return projectSet
+
+def searchProjects(terms, db):
+    splitTerms = terms.split(',')
+    results = db(((db.projects.title.contains(splitTerms)) | (db.projects.description.contains(splitTerms)) |
+                 (db.keywords.keyword.contains(splitTerms, all=False) &
+                  (db.keywords.id == db.projectKeywords.keywordID) &
+                  (db.projects.id == db.projectKeywords.projectID)
+                 )) & (db.projects.state == 'open')
+                ).select(db.projects.id, db.projects.title, db.projects.description)
+    return results
