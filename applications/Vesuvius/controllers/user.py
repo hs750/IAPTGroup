@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from IAPTlib import addImagesToProjects
 
 def create():
     #define the registration form structure with all fields and validation
@@ -53,3 +54,22 @@ def login():
     elif loginform.errors:
         response.flash = 'Login attempt failed. See below for more details.'
     return dict(form=loginform)
+
+@auth.requires_login()
+def dashboard():
+    if request.vars.action is not None and request.vars.id is not None:
+        proj = db(db.projects.id == request.vars.id).select()[0]
+        if request.vars.action == 'Open':
+            proj.state = projectStates[0]
+        elif request.vars.action == 'Close':
+            proj.state = projectStates[1]
+        proj.update_record()
+
+    projects = db(db.projects.userID == auth.user.id).select()
+    projects = addImagesToProjects(projects, db)
+
+    transcriptions = db((db.contributions.userID == auth.user.id) &
+                        (db.contributions.documentID == db.documents.id) &
+                        (db.documents.projectID == db.projects.id)
+                        ).select(db.contributions.content, db.contributions.state, db.projects.title, db.documents.title)
+    return dict(projects=projects, transcriptions=transcriptions)

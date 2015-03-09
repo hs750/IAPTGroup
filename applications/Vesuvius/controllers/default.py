@@ -101,7 +101,6 @@ def browse():
         searchTerms = request.vars.search
     print searchTerms
     results = searchProjects(searchTerms, db)
-    print results[0]
     searchForm = FORM(INPUT(_type='search', _placeholder='Search', _name='searchField'),
                       INPUT(_type='submit', _value='Search', _name='searchSubmit'),
                       _name='searchForm',

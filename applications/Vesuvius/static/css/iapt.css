@@ -114,6 +114,19 @@
     margin-left: 30%;
 }
 
+.dashProjListItem{
+    width: 49%;
+    float: left;
+}
+
+.dashProjList {
+    width: 100%;
+}
+
+.dashTranscriptions {
+    clear: both;
+}
+
 #liveresults {
     background-color: white;
     width: 300px;

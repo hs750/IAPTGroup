@@ -26,7 +26,7 @@ response.menu = [
     (T('Home'), False, URL('default', 'index'), []),
     (T('Create'), False, URL('default', 'create'), []),
     (T('Browse'), False, URL('default', 'browse'), []),
-    (T('Dashboard'), False, URL('default', 'dashboard'), [])
+    (T('Dashboard'), False, URL('user', 'dashboard'), [])
 ]
 
 DEVELOPMENT_MENU = True
