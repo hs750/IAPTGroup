@@ -50,7 +50,7 @@ def index():
     for i in range(0,min(5, len(projPercentateComplete))):
         topFiveIDs.append(projPercentateComplete[i][0])
 
-    topFive = db(db.projects.id.belongs(topFiveIDs)).select()
+    topFive = db(db.projects.id.belongs(topFiveIDs) & (db.projects.state == projectStates[0])).select()
 
     newest = addImagesToProjects(newest, db)
     topFive = addImagesToProjects(topFive, db)
