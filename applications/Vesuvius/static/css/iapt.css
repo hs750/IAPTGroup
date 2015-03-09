@@ -113,3 +113,16 @@
 .transForm form .controls {
     margin-left: 30%;
 }
+
+.dashProjListItem{
+    width: 49%;
+    float: left;
+}
+
+.dashProjList {
+    width: 100%;
+}
+
+.dashTranscriptions {
+    clear: both;
+}

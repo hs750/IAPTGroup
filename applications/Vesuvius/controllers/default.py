@@ -78,9 +78,6 @@ def create():
         response.flash = 'One or more of your fields have errors. See below for more information'
     return dict(projform=projform)
 
-def dashboard():
-    return index()
-
 def browse():
     if request.vars.search is None:
         searchTerms = ''
