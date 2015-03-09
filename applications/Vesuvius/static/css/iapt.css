@@ -113,3 +113,69 @@
 .transForm form .controls {
     margin-left: 30%;
 }
+
+#liveresults {
+    background-color: white;
+    width: 300px;
+    padding: 4px 6px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    max-height: 400px;
+    overflow: auto;
+    position: absolute;
+    z-index: 99;
+    border: 1px solid black;
+    border-radius: 4px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+
+/* Don't touch. Magic. */
+.liveSearchResult:first-child {
+    border-top: none;
+    padding-top: 10px;
+}
+
+#liveresults a{
+    color:#333;
+}
+
+.liveSearchResult {
+    position: relative;
+    display: block;
+    height: 100px;
+    overflow: hidden;
+    border-top: 1px solid black;
+    padding-top: 9px;
+    padding-bottom: 10px;
+}
+
+/*
+.liveSearchResult:hover {
+    background-color: #C4E1FF;
+}*/
+
+.liveSearchResultTileTitle {
+    position: absolute;
+    left: 80px;
+    top: 15px;
+    margin: 0px;
+}
+
+.liveSearchResultTileImg {
+    position: absolute;
+    left: 5px;
+    top: 15px;
+    border: 1px solid #333;
+}
+
+.liveSearchResultTileImg img {
+    width: 60px;
+    height: 90px;
+}
+
+.liveSearchResultTileDesc {
+    position: absolute;
+    left: 80px;
+    top: 40px;
+    text-overflow: ellipsis;
+}

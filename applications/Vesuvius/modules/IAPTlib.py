@@ -1,8 +1,8 @@
 
 ### DEVELOPER NOTE:
-# If you edit a web2py module (anything in the /modules/ folder) you must
-# restart web2py completely (the server must be restarted) for changes to come through.
-# Refreshing the page is not enough.
+# If you edit a web2py module (anything in the /modules/ folder) you must restart
+# web2py completely for changes to come through.
+# Refreshing the page or restarting the server is not enough.
 
 def addImagesToProjects(projectSet, db):
     """
@@ -13,16 +13,26 @@ def addImagesToProjects(projectSet, db):
     """
     for proj in projectSet:
         docImg = db(db.documents.projectID == proj.id).select(db.documents.image, db.documents.title)
-        proj['image'] = docImg[0].image
-        proj['imageAlt'] = 'Image of: ' + docImg[0].title
+        if docImg:
+          proj['image'] = docImg[0].image
+          proj['imageAlt'] = 'Image of: ' + docImg[0].title
+        else:
+          ## Should not happen, can remove this when we are confident this won't happen.
+          print("Error: Project without a document image exists!")
     return projectSet
 
+# def searchProjects(terms, db):
+#     splitTerms = terms.split(',')
+#     results = db(((db.projects.title.contains(splitTerms)) | (db.projects.description.contains(splitTerms)) |
+#                  (db.keywords.keyword.contains(splitTerms, all=False) &
+#                   (db.keywords.id == db.projectKeywords.keywordID) &
+#                   (db.projects.id == db.projectKeywords.projectID)
+#                  )) & (db.projects.state == 'open')
+#                 ).select(db.projects.id, db.projects.title, db.projects.description)
+#     return results
+
+# This is a quick and dirty search workaround as the above search was returning nothing for me.
+# Searches only project titles.
 def searchProjects(terms, db):
-    splitTerms = terms.split(',')
-    results = db(((db.projects.title.contains(splitTerms)) | (db.projects.description.contains(splitTerms)) |
-                 (db.keywords.keyword.contains(splitTerms, all=False) &
-                  (db.keywords.id == db.projectKeywords.keywordID) &
-                  (db.projects.id == db.projectKeywords.projectID)
-                 )) & (db.projects.state == 'open')
-                ).select(db.projects.id, db.projects.title, db.projects.description)
-    return results
+    query = db.projects.title.like('%'+terms+'%')
+    return db(query).select(db.projects.title, db.projects.description, db.projects.id)

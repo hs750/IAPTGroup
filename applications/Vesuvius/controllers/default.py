@@ -78,6 +78,19 @@ def create():
         response.flash = 'One or more of your fields have errors. See below for more information'
     return dict(projform=projform)
 
+def liveSearch():
+    searchStr = request.vars.values()[0]
+    query = db.projects.title.like('%'+searchStr+'%')
+    projects = db(query).select(db.projects.title, db.projects.description, db.projects.id)
+    addImagesToProjects(projects, db)
+    items = []
+    for (i, project) in enumerate(projects):
+        nameDiv = H4(project.title, _class="liveSearchResultTileTitle", _id="res%s"%i)
+        imgDiv = DIV(IMG(_src=URL('default', 'getImage', args=[project.image]), _alt=project.imageAlt), _class="liveSearchResultTileImg")
+        descDiv = DIV(project.description, _class="liveSearchResultTileDesc")
+        items.append(A(nameDiv, imgDiv, descDiv, _href="#", _onclick="copyIntoSearch($('#res%s').html())"%i, _class="liveSearchResult"))
+    return TAG[''](*items)
+
 def dashboard():
     return index()
 
@@ -88,6 +101,7 @@ def browse():
         searchTerms = request.vars.search
     print searchTerms
     results = searchProjects(searchTerms, db)
+    print results[0]
     searchForm = FORM(INPUT(_type='search', _placeholder='Search', _name='searchField'),
                       INPUT(_type='submit', _value='Search', _name='searchSubmit'),
                       _name='searchForm',
