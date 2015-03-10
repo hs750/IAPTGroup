@@ -27,7 +27,7 @@
 
 .projInfoCol{
     float: right;
-    min-width: 74%;
+    width: 74%;
     height: 100%;
     padding-left: 2%;
 }
