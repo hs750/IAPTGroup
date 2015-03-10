@@ -1,11 +1,11 @@
 {{extend 'layout.html'}}
 
-<div class="homeProjLeft">
+<div class="homeProjLeft homeList">
     <h2>Most Recent</h2>
     {{projects = new}}
     {{include 'subviews/projectsList.html'}}
 </div>
-<div class="homeProjRight">
+<div class="homeProjRight homeList">
     <h2>Most Popular</h2>
     {{projects = topFive}}
     {{include 'subviews/projectsList.html'}}

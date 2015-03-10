@@ -2,30 +2,8 @@
 
 <div class="dashProjList">
     {{=H2('My Projects')}}
-    {{for project in projects:}}
-        <div class="dashProjListItem">
-            <div class="projImgCol">
-                {{=IMG(_src=URL('default', 'getImage', args=[project.image]), _alt=project.imageAlt)}}
-                {{=A('View', _href=URL('project', 'view', vars=dict(id=project.id)), _class='btn btn-primary')}}
-                {{
-                    action = 'Open'
-                    if project.state == 'open':
-                       action = 'Close'
-                    pass
-                }}
-                {{=A(action, _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger')}}
-                {{
-                    if action == 'Open':
-                        =A('Review', _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-success')
-                        pass
-                }}
-            </div>
-            <div class="projInfoCol">
-                {{=H4(project.title)}}
-                {{=DIV(project.description)}}
-            </div>
-        </div>
-    {{pass}}
+    {{dash = True}}
+    {{include 'subviews/projectsList.html'}}
 </div>
 <div class="dashTranscriptions">
 {{=H2('My Transcriptions')}}

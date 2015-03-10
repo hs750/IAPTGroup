@@ -1,13 +1,28 @@
 <div class="projectsList">
     {{for project in projects:}}
         <div class="projectsListItem">
+            <div class="projInfoCol">
+                <div>
+                    {{=H4(project.title)}}
+                    {{=DIV(project.description)}}
+                </div>
+            </div>
             <div class="projImgCol">
                 {{=IMG(_src=URL('default', 'getImage', args=[project.image]), _alt=project.imageAlt)}}
                 {{=DIV(A('View', _href=URL('project', 'view', vars=dict(id=project.id)), _class='btn btn-primary'))}}
-            </div>
-            <div class="projInfoCol">
-                {{=H4(project.title)}}
-                {{=DIV(project.description)}}
+                {{
+                    if 'dash' in locals() and dash is True:
+                        action = 'Open'
+                        if project.state == 'open':
+                           action = 'Close'
+                        pass
+                        =A(action, _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger')
+
+                        if action == 'Open':
+                            =A('Review', _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-success')
+                        pass
+                    pass
+                }}
             </div>
         </div>
     {{pass}}

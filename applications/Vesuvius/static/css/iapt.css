@@ -8,8 +8,9 @@
     width: 50%;
 }
 .projectsListItem{
+    width: 50%;
     height: auto;
-    clear: both;
+    float: left;
     padding-bottom: 10px;
     overflow: auto;
 }
@@ -25,14 +26,18 @@
 }
 
 .projInfoCol{
-    float: left;
-    width: 74%;
+    float: right;
+    min-width: 74%;
     height: 100%;
     padding-left: 2%;
 }
 
 .projInfoCol h4 {
     margin-top: 1px;
+}
+
+.homeList > .projectsList > .projectsListItem {
+    width: 100%;
 }
 
 .projDocDiv {
@@ -112,15 +117,6 @@
 
 .transForm form .controls {
     margin-left: 30%;
-}
-
-.dashProjListItem{
-    width: 49%;
-    float: left;
-}
-
-.dashProjList {
-    width: 100%;
 }
 
 .dashTranscriptions {
