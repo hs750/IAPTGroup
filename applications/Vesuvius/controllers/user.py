@@ -72,4 +72,11 @@ def dashboard():
                         (db.contributions.documentID == db.documents.id) &
                         (db.documents.projectID == db.projects.id)
                         ).select(db.contributions.content, db.contributions.state, db.projects.title, db.documents.title)
+
+    for project in projects:
+        docs = db(db.documents.projectID == project.id).count()
+        completeDocs = db((db.documents.projectID == project.id) & (db.documents.state == documentStates[1])).count()
+        project.totalDocs = docs
+        project.compDocs = completeDocs
+
     return dict(projects=projects, transcriptions=transcriptions)

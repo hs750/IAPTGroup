@@ -123,6 +123,12 @@
     clear: both;
 }
 
+.dashNotification {
+    margin-bottom: 0px;
+    padding: 1px;
+    text-align: center;
+}
+
 #liveresults {
     background-color: white;
     width: 300px;
