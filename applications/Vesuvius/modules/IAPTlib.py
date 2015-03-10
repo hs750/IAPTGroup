@@ -21,18 +21,19 @@ def addImagesToProjects(projectSet, db):
           print("Error: Project without a document image exists!")
     return projectSet
 
-# def searchProjects(terms, db):
-#     splitTerms = terms.split(',')
-#     results = db(((db.projects.title.contains(splitTerms)) | (db.projects.description.contains(splitTerms)) |
-#                  (db.keywords.keyword.contains(splitTerms, all=False) &
-#                   (db.keywords.id == db.projectKeywords.keywordID) &
-#                   (db.projects.id == db.projectKeywords.projectID)
-#                  )) & (db.projects.state == 'open')
-#                 ).select(db.projects.id, db.projects.title, db.projects.description)
-#     return results
-
-# This is a quick and dirty search workaround as the above search was returning nothing for me.
-# Searches only project titles.
 def searchProjects(terms, db):
-    query = db.projects.title.like('%'+terms+'%')
-    return db(query).select(db.projects.title, db.projects.description, db.projects.id)
+    """
+    Searches the database based on project title, project descriptions and keywords for a project. Will only return
+    project in state 'open'
+    :param terms: search terms
+    :param db: the database
+    :return: projects matching the search
+    """
+    splitTerms = terms.split(',')
+    results = db(((db.projects.title.contains(splitTerms)) | (db.projects.description.contains(splitTerms)) |
+                 (db.keywords.keyword.contains(splitTerms, all=False) &
+                  (db.keywords.id == db.projectKeywords.keywordID) &
+                  (db.projects.id == db.projectKeywords.projectID)
+                 )) & (db.projects.state == 'open')
+                ).select(db.projects.id, db.projects.title, db.projects.description)
+    return results

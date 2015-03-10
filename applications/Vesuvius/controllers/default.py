@@ -80,8 +80,7 @@ def create():
 
 def liveSearch():
     searchStr = request.vars.values()[0]
-    query = db.projects.title.like('%'+searchStr+'%')
-    projects = db(query).select(db.projects.title, db.projects.description, db.projects.id)
+    projects = searchProjects(searchStr, db)
     addImagesToProjects(projects, db)
     items = []
     for (i, project) in enumerate(projects):
