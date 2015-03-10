@@ -99,7 +99,7 @@ def browse():
         searchTerms = ''
     else:
         searchTerms = request.vars.search
-    print searchTerms
+
     results = searchProjects(searchTerms, db)
     searchForm = FORM(INPUT(_type='search', _placeholder='Search', _name='searchField'),
                       INPUT(_type='submit', _value='Search', _name='searchSubmit'),
