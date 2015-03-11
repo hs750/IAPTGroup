@@ -75,6 +75,15 @@ def transcribe():
             document.state = documentStates[1]
             document.update_record()
 
+        # Close the project if all documents have been completed
+        totalDocs = db(db.documents.projectID == document.projectID).count();
+        completedDocs = db((db.documents.projectID == document.projectID) &
+                           (db.documents.state == documentStates[1])).count()
+        if totalDocs == completedDocs:
+            proj = db(db.projects.id == document.projectID).select()[0]
+            proj.state = projectStates[1]
+            proj.update_record()
+
         redirect(URL('view', vars=dict(id=document.projectID)))
         response.flash = 'Transcription successfully saved.'
 
