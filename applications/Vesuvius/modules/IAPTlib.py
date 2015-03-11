@@ -17,8 +17,9 @@ def addImagesToProjects(projectSet, db):
           proj['image'] = docImg[0].image
           proj['imageAlt'] = 'Image of: ' + docImg[0].title
         else:
-          ## Should not happen, can remove this when we are confident this won't happen.
-          print("Error: Project without a document image exists!")
+          ## Illegal State!
+          proj['image'] = None
+          proj['imageAlt'] = None
     return projectSet
 
 def searchProjects(terms, db):
@@ -29,11 +30,11 @@ def searchProjects(terms, db):
     :param db: the database
     :return: projects matching the search
     """
-    splitTerms = terms.split(',')
+    splitTerms = terms.split(' ')
     results = db(((db.projects.title.contains(splitTerms)) | (db.projects.description.contains(splitTerms)) |
                  (db.keywords.keyword.contains(splitTerms, all=False) &
                   (db.keywords.id == db.projectKeywords.keywordID) &
                   (db.projects.id == db.projectKeywords.projectID)
                  )) & (db.projects.state == 'open')
-                ).select(db.projects.id, db.projects.title, db.projects.description)
+                ).select(db.projects.id, db.projects.title, db.projects.description, distinct=True)
     return results
