@@ -55,6 +55,20 @@
     float: right;
 }
 
+.transHead a {
+    float: left;
+    width: 10%;
+}
+.transHead .headText {
+    float: left;
+    width: 80%;
+    padding-left: 10px;
+}
+
+.transHead .headText div{
+    margin-bottom: 5px;
+}
+
 .docNavArrow {
     padding-top: 20px;
     height: 53px;
@@ -98,6 +112,7 @@
 }
 
 .transContent {
+    clear: both;
     padding-left: 85px;
     padding-right: 85px;
 }
