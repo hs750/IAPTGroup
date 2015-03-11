@@ -48,11 +48,13 @@ def login():
             #response.flash = 'Login attempt failed. Have you forgotten your <a href="' + URL('default','user',args=['retrieve_username']) + '">username</a> or password?'
             response.flash = 'Login attempt failed. Please try again'
         else:
-            redirect(URL('default', 'index'))
-
+            redirect(session.returnURL)
     #if validation doesn't pass, highlight errors
     elif loginform.errors:
         response.flash = 'Login attempt failed. See below for more details.'
+    #Save URL for redirect
+    else:
+        session.returnURL = request.env.http_referer
     return dict(form=loginform)
 
 @auth.requires_login()
