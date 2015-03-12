@@ -31,10 +31,18 @@ def searchProjects(terms, db):
     :return: projects matching the search
     """
     splitTerms = terms.split(' ')
-    results = db(((db.projects.title.contains(splitTerms)) | (db.projects.description.contains(splitTerms)) |
-                 (db.keywords.keyword.contains(splitTerms, all=False) &
-                  (db.keywords.id == db.projectKeywords.keywordID) &
-                  (db.projects.id == db.projectKeywords.projectID)
-                 )) & (db.projects.state == 'open')
-                ).select(db.projects.id, db.projects.title, db.projects.description, distinct=True)
+    titleQuery = (db.projects.title.contains(splitTerms, all=True))
+    descriptionQuery = (db.projects.description.contains(splitTerms, all=True))
+    keywordsQuery = (db.keywords.keyword.contains(splitTerms, all=False) &
+                    (db.keywords.id == db.projectKeywords.keywordID) &
+                    (db.projects.id == db.projectKeywords.projectID)
+                    )
+    openQuery = (db.projects.state == 'open')
+
+    if db(db.projectKeywords.id > 0).count() > 0:
+        query = ((titleQuery | descriptionQuery | keywordsQuery) & openQuery)
+    else:
+        query = ((titleQuery | descriptionQuery) & openQuery)
+
+    results = db(query).select(db.projects.id, db.projects.title, db.projects.description, distinct=True)
     return results
