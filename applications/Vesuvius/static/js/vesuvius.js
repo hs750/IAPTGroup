@@ -32,3 +32,7 @@ function copyIntoSearch(value) {
     hide();
     $("#nav-search-form").submit();
 }
+
+function closeSearchFrame() {
+    hide();
+}
