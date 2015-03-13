@@ -1,6 +1,6 @@
 {{extend 'layout.html'}}
         <div class="transHead">
-            {{=A('Return to Project: ' + owningProject.title, _href=URL('view', vars=dict(id=owningProject.id)), _class='btn btn-default')}}
+            {{=A('Return to Project: ' + owningProject.title, _href=URL('view', vars=dict(id=owningProject.id)), _class='btn btn-default', _id='returnButton')}}
             <div class="headText">
                 <div class="alert alert-info">
                     Transcribe the document in the text areas below.
@@ -10,7 +10,7 @@
                 </div>
                 {{
                     if contributed is True:
-                        =DIV('You have transcribed this document', _class='alert alert-success')
+                        =DIV('You have transcribed this document! You can\'t transcribe again. ', A('Return to Project', _href=URL('view', vars=dict(id=owningProject.id))), _class='alert alert-success')
                     pass
                 }}
             </div>
@@ -20,10 +20,13 @@
         {{=DIV(doc.description)}}
         <div>
             {{=DIV(IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description), _class='transImg')}}
-            {{=DIV(form, _class='transForm')}}
+            {{
+                if not contributed:
+                    =DIV(form, _class='transForm')
+                pass
+            }}
         </div>
         </div>
-
         <div class="transFoot">
             {{=DIV('Document ' + str(currentDoc) + ' of ' + str(totalDocs))}}
             {{=A(SPAN('Previous'), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docPrevArrow')}}

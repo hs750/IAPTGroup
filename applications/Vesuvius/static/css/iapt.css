@@ -43,6 +43,8 @@
 .projDocDiv {
     text-align: center;
     width: 15%;
+    float:left;
+    margin-left: 2%
 }
 
 .transImg {
@@ -55,7 +57,7 @@
     float: right;
 }
 
-.transHead a {
+.transHead #returnButton {
     float: left;
     width: 10%;
 }

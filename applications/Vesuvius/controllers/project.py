@@ -85,9 +85,9 @@ def transcribe():
             proj.update_record()
 
         response.flash = 'Transcription successfully saved.'
-    userContribCount = db((db.contributions.documentID == document.id) &
-                              (db.contributions.userID == auth.user.id)).count()
+    contributed = not db((db.contributions.documentID == document.id) &
+                         (db.contributions.userID == auth.user.id)).isempty()
     owningProject = db(db.projects.id == document.projectID).select(db.projects.id, db.projects.title)[0]
 
     return dict(form=form, doc=document, nextDocID=nextDocID, prevDocID=prevDocID, totalDocs=numDocs,
-                currentDoc=currentDocIndex+1, contributed=(userContribCount > 0), owningProject=owningProject)
+                currentDoc=currentDocIndex+1, contributed=contributed, owningProject=owningProject)
