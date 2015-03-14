@@ -223,3 +223,8 @@
     clip: rect(0,0,0,0);
     border: 0;
 }
+
+input:read-only, textarea:read-only {
+    background-color: whitesmoke;
+    cursor: text;
+}

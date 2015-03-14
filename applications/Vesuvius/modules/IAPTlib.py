@@ -1,3 +1,4 @@
+from html import *
 
 ### DEVELOPER NOTE:
 # If you edit a web2py module (anything in the /modules/ folder) you must restart
@@ -46,3 +47,32 @@ def searchProjects(terms, db):
 
     results = db(query).select(db.projects.id, db.projects.title, db.projects.description, distinct=True)
     return results
+
+def getTranscribeReviewForm(enabled, requirements, valuesInc):
+    """
+    A form used for transcribing and reviewing (displaying transcriptions)
+    :param enabled: Whether to enable/disable input into the form
+    :param requirements: Form creates a input for each requirement.
+    :param valuesInc: If pre-fill values for each requirement are included in requirements as 'content'
+    :return: A form
+    """
+    form = FORM(_class='form-horizontal')
+    rCount = 0
+    for req in requirements:
+        intputName = 'req-' + str(rCount)
+        ctrlGroup = DIV(_class='control-group')
+        ctrlGroup.append(LABEL(req.name, _for=intputName, _class='control-label'))
+        input = INPUT(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
+        if req.type == 'Short Text':
+            input = INPUT(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
+        elif req.type == 'Long Text':
+            input = TEXTAREA(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
+        elif req.type == 'Date':
+            input = INPUT(_name=intputName, _type='date', value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
+        elif req.type == 'Number':
+            input = INPUT(_name=intputName, _type='number', value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
+
+        ctrlGroup.append(DIV(input, _class='controls'))
+        form.append(ctrlGroup)
+        rCount += 1
+    return form

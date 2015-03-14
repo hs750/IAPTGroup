@@ -1,4 +1,4 @@
-
+from IAPTlib import getTranscribeReviewForm
 def view():
     projID = request.vars.get('id')
     project = db(db.projects.id == projID).select()[0]
@@ -19,38 +19,10 @@ def transcribe():
     docsInProj = db((db.documents.projectID == document.projectID)
                     & (db.documents.state == documentStates[0])).select(db.documents.id)
 
-    currentDocIndex = 0
-    i = 0
-    for doc in docsInProj:
-        if doc.id == document.id:
-            currentDocIndex = i
-        i += 1
-
-    numDocs = len(docsInProj)
-    nextDocID = docsInProj[(currentDocIndex + 1) % numDocs].id
-    prevDocID = docsInProj[(currentDocIndex - 1) % numDocs].id
+    (numDocs, nextDocID, prevDocID, currentDocIndex) = getNextAndPrevious(docsInProj, document.id)
 
     # Generate the form
-    form = FORM(_class='form-horizontal')
-
-    rCount = 0
-    for req in requirements:
-        intputName = 'req-' + str(rCount)
-        ctrlGroup = DIV(_class='control-group')
-        ctrlGroup.append(LABEL(req.name, _for=intputName, _class='control-label'))
-        input = INPUT(_name=intputName)
-        if req.type == requirementTypes[0]:
-            input = INPUT(_name=intputName)
-        elif req.type == requirementTypes[1]:
-            input = TEXTAREA(_name=intputName)
-        elif req.type == requirementTypes[2]:
-            input = INPUT(_name=intputName, _type='date')
-        elif req.type == requirementTypes[3]:
-            input = INPUT(_name=intputName, _type='number')
-
-        ctrlGroup.append(DIV(input, _class='controls'))
-        form.append(ctrlGroup)
-        rCount += 1
+    form = getTranscribeReviewForm(True, requirements, False)
     form.append(DIV(DIV(INPUT(_name='submit', _type='submit'), _class='controls'), _class='control-group'))
 
     if form.accepts(request.post_vars):
@@ -99,3 +71,74 @@ def review():
     documents = db(db.documents.projectID == projID).select()
 
     return dict(docs=documents)
+
+
+@auth.requires_login()
+def reviewDoc():
+    response.subtitle = 'Review Document'
+    docID = request.vars.get('id')
+
+    document = db(db.documents.id == docID).select()[0]
+    owningProject = db(db.projects.id == document.projectID).select(db.projects.id, db.projects.title)[0]
+
+    usersTranscribed = db(db.contributions.documentID == docID).select(db.contributions.userID, distinct=True)
+    for user in usersTranscribed:
+        user.transcriptions = db((db.contributions.documentID == docID) &
+                                 (db.contributions.userID == user.userID) &
+                                 (db.contributions.requirementID == db.requirements.id)).select(
+            db.requirements.type.with_alias('type'), db.requirements.name.with_alias('name'),
+            db.contributions.content.with_alias('content'), db.contributions.id.with_alias('contribID')
+        )
+
+    docsInProj = db(db.documents.projectID == document.projectID).select(db.documents.id)
+    (numDocs, nextDocID, prevDocID, currentDocIndex) = getNextAndPrevious(docsInProj, document.id)
+
+    if request.vars.accepted is not None:
+        accept = request.vars.accepted
+        if accept == 'reject':
+            for transcription in usersTranscribed:
+                for trans in transcription.transcriptions:
+                    contrib = db(db.contributions.id == trans.contribID).select()[0]
+                    contrib.state = contributionStates[2]
+                    contrib.update_record()
+            document.state = documentStates[0]
+            document.update_record()
+        else:
+            count = 1
+            for transcription in usersTranscribed:
+                if accept == str(count):
+                    for trans in transcription.transcriptions:
+                        contrib = db(db.contributions.id == trans.contribID).select()[0]
+                        contrib.state = contributionStates[1]
+                        contrib.update_record()
+                else:
+                    for trans in transcription.transcriptions:
+                        contrib = db(db.contributions.id == trans.contribID).select()[0]
+                        contrib.state = contributionStates[2]
+                        contrib.update_record()
+                count += 1
+            document.state = documentStates[2]
+            document.update_record()
+
+
+    return dict(document=document, userTranscriptions=usersTranscribed, owningProject=owningProject,
+                nextDocID=nextDocID, prevDocID=prevDocID, totalDocs=numDocs, currentDoc=currentDocIndex+1)
+
+def getNextAndPrevious(docsInProj, currentDocumentID):
+    """
+    Find the ids of the next and the previous documents
+    :param docsInProj: a list of the documents in the project
+    :param currentDocumentID: the id of the current document
+    :return: number of documents, next document id, previous document id and the index in the list of the current document.
+    """
+    currentDocIndex = 0
+    i = 0
+    for doc in docsInProj:
+        if doc.id == currentDocumentID:
+            currentDocIndex = i
+        i += 1
+
+    numDocs = len(docsInProj)
+    nextDocID = docsInProj[(currentDocIndex + 1) % numDocs].id
+    prevDocID = docsInProj[(currentDocIndex - 1) % numDocs].id
+    return (numDocs, nextDocID, prevDocID, currentDocIndex)

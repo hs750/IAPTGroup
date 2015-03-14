@@ -2,12 +2,12 @@ from gluon.tools import Auth
 
 db = DAL('sqlite://IAPT_DB.db')
 
-auth = Auth(db) #TODO Dave to sort authentication
-auth.define_tables(username=True,signature=False)
+auth = Auth(db)
+auth.define_tables(username=True, signature=False)
 
 # System State Constants
 projectStates = ['open', 'closed']
-documentStates = ['open', 'completed']
+documentStates = ['open', 'completed', 'finalised']
 contributionStates = ['pending', 'accepted', 'rejected']
 
 db.define_table(
