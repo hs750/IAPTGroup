@@ -4,10 +4,15 @@
             {{=H3(doc.title)}}
             {{=IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description)}}
             {{
-                if doc.state == documentStates[1]:
-                    =DIV('This document is Done!', _class='alert alert-info')
+                if 'review' in locals() and review is True:
+                    =DIV('This document is ', B(doc.state), _class='alert alert-info')
+                    =DIV(A('Review', _href=URL('project', 'reviewDoc', vars=dict(id=doc.id)), _class='btn btn-primary'))
                 else:
-                    =DIV(A('Transcribe', _href=URL('project', 'transcribe', vars=dict(id=doc.id)), _class='btn btn-primary'))
+                    if doc.state == documentStates[1]:
+                        =DIV('This document is Done!', _class='alert alert-info')
+                    else:
+                        =DIV(A('Transcribe', _href=URL('project', 'transcribe', vars=dict(id=doc.id)), _class='btn btn-primary'))
+                    pass
                 pass
             }}
         </div>

@@ -91,3 +91,11 @@ def transcribe():
 
     return dict(form=form, doc=document, nextDocID=nextDocID, prevDocID=prevDocID, totalDocs=numDocs,
                 currentDoc=currentDocIndex+1, contributed=contributed, owningProject=owningProject)
+
+@auth.requires_login()
+def review():
+    response.subtitle = 'Review Project'
+    projID = request.vars.get('id')
+    documents = db(db.documents.projectID == projID).select()
+
+    return dict(docs=documents)
