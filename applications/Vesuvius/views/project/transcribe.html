@@ -29,6 +29,6 @@
         </div>
         <div class="transFoot">
             {{=DIV('Document ' + str(currentDoc) + ' of ' + str(totalDocs))}}
-            {{=A(SPAN('Previous'), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docPrevArrow')}}
-            {{=A(SPAN('Next'), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docNextArrow')}}
+            {{=A(SPAN('Previous', SPAN(' Document', _class='sr-only')), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docPrevArrow')}}
+            {{=A(SPAN('Next', SPAN(' Document', _class='sr-only')), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docNextArrow')}}
         </div>
