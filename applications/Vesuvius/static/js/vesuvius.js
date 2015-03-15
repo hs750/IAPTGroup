@@ -10,16 +10,16 @@ jQuery(document).ready(function() {
 });
 
 // Call on keyup to pass data to controller function
-    function getData(value) {
-        if(value != "") {
-            $("#liveresults").show();
-            $.post("liveSearch",{partialstr:value},function(result){
-                $("#liveresults").html(result);
-            });
-        } else {
-            hide();
-        }
+function getData(url, value) {
+    if(value != "") {
+        $("#liveresults").show();
+        $.post(url,{partialstr:value},function(result){
+            $("#liveresults").html(result);
+        });
+    } else {
+        hide();
     }
+}
 
 // Hide live search dropdown
 function hide() {
