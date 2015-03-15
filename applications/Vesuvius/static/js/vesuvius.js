@@ -36,3 +36,6 @@ function copyIntoSearch(value) {
 function closeSearchFrame() {
     hide();
 }
+
+/* Fix javascript modulo bug, taken from http://javascript.about.com/od/problemsolving/a/modulobug.htm 15 Mar 1015*/
+Number.prototype.mod = function(n) { return ((this%n)+n)%n; }

@@ -1,39 +1,69 @@
 {{from IAPTlib import getTranscribeReviewForm}}
 {{extend 'layout.html'}}
-        <div class="transHead">
-            {{=A('Return to Project: ' + owningProject.title, _href=URL('review', vars=dict(id=owningProject.id)), _class='btn btn-default', _id='returnButton')}}
-            <div class="headText">
-                <div class="alert alert-info">
-                    To accept a transcription, click the 'Accept' button below the transcription.
-                    This will reject all the other transcriptions.
-                    Alternatively you can reject all the transcriptions, this will open the document to the public if you reopen the project.
-                </div>
-            </div>
+<div class="transHead">
+    {{=A('Return to Project: ' + owningProject.title, _href=URL('review', vars=dict(id=owningProject.id)), _class='btn btn-default', _id='returnButton')}}
+    <div class="headText">
+        <div class="alert alert-info">
+            To accept a transcription, click the 'Accept' button below the transcription.
+            This will reject all the other transcriptions.
+            Alternatively you can reject all the transcriptions, this will open the document to the public if you reopen the project.
         </div>
-        <div class="transContent">
-            {{=H2(document.title)}}
-            {{=DIV(document.description)}}
-        <div>
-        <div class="transContent">
-            {{=DIV(IMG(_src=URL('default', 'getImage', args=[document.image]), _alt=document.description, _class='transImg'))}}
-            {{
-                count = 1
-                for trans in userTranscriptions:
-                    form = getTranscribeReviewForm(False, trans.transcriptions, True)
-                    acceptBtn = A('Accept', SPAN(' Transcription ' + str(count), _class='sr-only'), _href=URL(vars=dict(id=document.id, accepted=count)), _class='btn btn-success')
+    </div>
+</div>
+<div class="transContent">
+    {{=H2(document.title)}}
+    {{=DIV(document.description)}}
+<div>
+<div class="transContent">
+    {{=DIV(IMG(_src=URL('default', 'getImage', args=[document.image]), _alt=document.description, _class='transImg'))}}
+    {{
+        count = 1
+        display = int(request.vars.get('display', 1))
+        for trans in userTranscriptions:
+            form = getTranscribeReviewForm(False, trans.transcriptions, True)
+            acceptBtn = A('Accept', SPAN(' Transcription ' + str(count), _class='sr-only'), _href=URL(vars=dict(id=document.id, accepted=count)), _class='btn btn-success')
 
-                    prevTrans = A(SPAN('Previous', SPAN(' Transcription', _class='sr-only')), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-info ')
-                    nextTrans = A(SPAN('Next', SPAN(' Transcription', _class='sr-only')), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-info')
+            =DIV(H3('Transcription ' + str(count)), form, acceptBtn, _class='transForm', _hidden=(count != display), _id='trans'+str(count))
+            count += 1
 
-                    =DIV(H3('Transcription ' + str(count)), form, acceptBtn, prevTrans, nextTrans, _class='transForm'))# + (' sr-only' if count > 1 else ''))
-                    count += 1
-                pass
-            }}
+        pass
+        = A(SPAN('Previous', SPAN(' Transcription', _class='sr-only')), _href=URL(vars=dict(id=document.id, display=((display-2) % (count-1))+1)), _class='btn btn-info ', _id='prevT')
+        = A(SPAN('Next', SPAN(' Transcription', _class='sr-only')), _href=URL(vars=dict(id=document.id, display=(display % (count-1))+1)), _class='btn btn-info', _id='nextT')
+    }}
 
-        </div>
-        <div class="transFoot">
-            {{=A(SPAN('Reject All Transcriptions'), _href=URL(vars=dict(id=document.id, accepted='reject')), _class='btn btn-danger btn-lg')}}
-            {{=DIV('Document ' + str(currentDoc) + ' of ' + str(totalDocs))}}
-            {{=A(SPAN('Previous', SPAN(' Document', _class='sr-only')), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docPrevArrow')}}
-            {{=A(SPAN('Next', SPAN(' Document', _class='sr-only')), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docNextArrow')}}
-        </div>
+</div>
+<div class="transFoot">
+    {{=A(SPAN('Reject All Transcriptions'), _href=URL(vars=dict(id=document.id, accepted='reject')), _class='btn btn-danger btn-lg')}}
+    {{=DIV('Document ' + str(currentDoc) + ' of ' + str(totalDocs))}}
+    {{=A(SPAN('Previous', SPAN(' Document', _class='sr-only')), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docPrevArrow')}}
+    {{=A(SPAN('Next', SPAN(' Document', _class='sr-only')), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docNextArrow')}}
+</div>
+<script>
+    var currentIndex = {{=display}};
+    var total = {{=count}};
+    $( "#prevT" ).click(function(e) {
+        e.preventDefault();
+        currentIndex = ((currentIndex-2).mod(total-1))+1;
+        for (var i = 1; i <= total; i++) {
+            console.log(currentIndex)
+            if (currentIndex == i) {
+                $ ( "#trans" + i).removeAttr("hidden");
+            }else{
+                $ ( "#trans" + i).attr("hidden", "hidden");
+            }
+        }
+    });
+    $( "#nextT" ).click(function(e) {
+        e.preventDefault();
+        currentIndex = (currentIndex.mod(total-1))+1;
+        for (var i = 1; i <= total; i++) {
+            console.log(currentIndex)
+            if (currentIndex == i) {
+                $ ( "#trans" + i).removeAttr("hidden");
+            }else{
+                $ ( "#trans" + i).attr("hidden", "hidden");
+            }
+        }
+    });
+
+</script>
