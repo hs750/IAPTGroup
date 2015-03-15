@@ -8,6 +8,19 @@
             This will reject all the other transcriptions.
             Alternatively you can reject all the transcriptions, this will open the document to the public if you reopen the project.
         </div>
+        {{
+            if acceptedTranscription == -1:
+                acceptText = 'No transcriptions have been accepted'
+                acceptClass = 'info'
+            elif acceptedTranscription == 0:
+                acceptText = 'All transcriptions have been rejected!'
+                acceptClass = 'warning'
+            elif acceptedTranscription > 0:
+                acceptText = 'Transcription ' + str(acceptedTranscription) + ' has been accepted!'
+                acceptClass = 'success'
+            pass
+            =DIV(acceptText, _class='alert alert-'+acceptClass)
+        }}
     </div>
 </div>
 <div class="transContent">

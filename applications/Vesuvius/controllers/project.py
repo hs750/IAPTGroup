@@ -120,9 +120,30 @@ def reviewDoc():
             document.state = documentStates[2]
             document.update_record()
 
+    transcriptionStates = db(db.contributions.documentID == docID).select(db.contributions.userID,
+                                                                          db.contributions.state, distinct=True)
+
+    print transcriptionStates
+    acceptedTrans = -1
+    anyRejected = False
+    for tState in transcriptionStates:
+        if tState.state == contributionStates[1]:
+            acceptedTrans = tState.userID
+        elif tState.state == contributionStates[2]:
+            anyRejected = True
+    print acceptedTrans
+    # -1 indicates nothing has been accepted or rejected, 0 indicates all rejected
+    acceptedIndex = 0 if anyRejected else -1
+    count = 1
+    for user in usersTranscribed:
+        if user.userID == acceptedTrans:
+            acceptedIndex = count
+        count += 1
+
 
     return dict(document=document, userTranscriptions=usersTranscribed, owningProject=owningProject,
-                nextDocID=nextDocID, prevDocID=prevDocID, totalDocs=numDocs, currentDoc=currentDocIndex+1)
+                nextDocID=nextDocID, prevDocID=prevDocID, totalDocs=numDocs, currentDoc=currentDocIndex+1,
+                acceptedTranscription=acceptedIndex)
 
 def getNextAndPrevious(docsInProj, currentDocumentID):
     """
