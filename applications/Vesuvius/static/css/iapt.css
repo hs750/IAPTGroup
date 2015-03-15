@@ -72,9 +72,8 @@
 }
 
 .docNavArrow {
-    padding-top: 20px;
     height: 53px;
-    min-width: 60px;
+    min-width: 40px;
     position: absolute;
     top: 50%;
 }
@@ -85,32 +84,37 @@
 #docNextArrow {
     right: 1%;
 }
-#docPrevArrow:before {
-    font-size: 50pt;
-    content: "<";
+#docPrevArrow, #prevT {
+    background-image: url("../images/left.png");
+    background-size: contain;
+    background-repeat: no-repeat;
 }
-#docNextArrow:after {
-    font-size: 50pt;
-    content: ">";
-}
-
-#docNextArrow:hover {
-    padding-right: 22px;
+#docNextArrow, #nextT {
+    background-image: url("../images/right.png");
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
-#docPrevArrow:hover {
-    padding-left: 22px;
-}
-
-.docNavArrow span {
+.docNavArrow .arrow-label {
     display: none;
     font-size: 30pt;
+    text-decoration: none;
 }
 
-.docNavArrow:hover > span {
-    display: inline;
-    padding-left: 5px;
-    padding-right: 5px;
+#docPrevArrow .arrow-label{
+    margin-left: 45px;
+}
+
+#docNextArrow .arrow-label{
+    margin-right: 45px;
+}
+
+#docNextArrow, #nextT {
+    background-position: right;
+}
+
+.docNavArrow:hover  .arrow-label, .docNavArrow:focus .arrow-label {
+    display: block;
 }
 
 .transContent {
@@ -230,26 +234,16 @@ input:read-only, textarea:read-only {
 }
 
 .docNavArrow-small {
-    padding-top: 6px;
     height: 25px;
-    min-width: 15px;
+    min-width: 10px;
 }
 
-#prevT:before {
-    font-size: 20pt;
-    content: "<";
-}
-#nextT:after {
-    font-size: 20pt;
-    content: ">";
+#nextT .arrow-label{
+    margin-right: 18px;
 }
 
-#nextT:hover {
-    padding-right: 12px;
-}
-
-#prevT:hover {
-    padding-left: 12px;
+#prevT .arrow-label{
+    margin-left: 18px;
 }
 
 #prevT {
@@ -260,7 +254,7 @@ input:read-only, textarea:read-only {
     right: 11%;
 }
 
-.docNavArrow-small span {
+.docNavArrow-small .arrow-label {
     font-size: 18pt;
 }
 
@@ -274,4 +268,17 @@ input:read-only, textarea:read-only {
 
 .reviewForm {
     width: 63%;
+}
+
+.docNavArrow:hover, .docNavArrow:focus{
+    background-position: 0 0px;
+}
+
+.docNavArrow .arrow-label {
+    position: relative;
+    top: 15px;
+}
+
+.docNavArrow-small .arrow-label {
+    top: 0px;
 }
