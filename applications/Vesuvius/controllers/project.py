@@ -41,8 +41,10 @@ def transcribe():
                 requirementID=req.id
             )
 
-        # If the number of contributions to the document is greater than 3, close the document
-        numContibs = db((db.contributions.documentID == docID) & (db.contributions.requirementID == requirements[0].id)).count()
+        # If the number of pending contributions to the document is greater than 3, close the document
+        numContibs = db((db.contributions.documentID == docID) &
+                        (db.contributions.requirementID == requirements[0].id) &
+                        (db.contributions.state == contributionStates[0])).count()
         if numContibs >= 3:
             document.state = documentStates[1]
             document.update_record()
