@@ -228,3 +228,50 @@ input:read-only, textarea:read-only {
     background-color: whitesmoke;
     cursor: text;
 }
+
+.docNavArrow-small {
+    padding-top: 6px;
+    height: 25px;
+    min-width: 15px;
+}
+
+#prevT:before {
+    font-size: 20pt;
+    content: "<";
+}
+#nextT:after {
+    font-size: 20pt;
+    content: ">";
+}
+
+#nextT:hover {
+    padding-right: 12px;
+}
+
+#prevT:hover {
+    padding-left: 12px;
+}
+
+#prevT {
+    left: 37%;
+}
+
+#nextT {
+    right: 11%;
+}
+
+.docNavArrow-small span {
+    font-size: 18pt;
+}
+
+.acceptBtn  {
+    text-align: center;
+}
+
+.reviewImg {
+    width: 30%;
+}
+
+.reviewForm {
+    width: 63%;
+}

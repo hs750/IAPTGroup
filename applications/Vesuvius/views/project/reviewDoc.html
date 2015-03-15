@@ -13,24 +13,23 @@
 <div class="transContent">
     {{=H2(document.title)}}
     {{=DIV(document.description)}}
-<div>
-<div class="transContent">
-    {{=DIV(IMG(_src=URL('default', 'getImage', args=[document.image]), _alt=document.description, _class='transImg'))}}
-    {{
-        count = 1
-        display = int(request.vars.get('display', 1))
-        for trans in userTranscriptions:
-            form = getTranscribeReviewForm(False, trans.transcriptions, True)
-            acceptBtn = A('Accept', SPAN(' Transcription ' + str(count), _class='sr-only'), _href=URL(vars=dict(id=document.id, accepted=count)), _class='btn btn-success')
+    <div>
+        {{=DIV(IMG(_src=URL('default', 'getImage', args=[document.image]), _alt=document.description, _class='transImg reviewImg'))}}
+        {{
+            count = 1
+            display = int(request.vars.get('display', 1))
+            for trans in userTranscriptions:
+                form = getTranscribeReviewForm(False, trans.transcriptions, True)
+                acceptBtn = DIV(A('Accept', SPAN(' Transcription ' + str(count), _class='sr-only'), _href=URL(vars=dict(id=document.id, accepted=count)), _class='btn btn-success'), _class='acceptBtn')
 
-            =DIV(H3('Transcription ' + str(count)), form, acceptBtn, _class='transForm', _hidden=(count != display), _id='trans'+str(count))
-            count += 1
+                =DIV(H3('Transcription ' + str(count)), form, acceptBtn, _class='transForm reviewForm', _hidden=(count != display), _id='trans'+str(count))
+                count += 1
 
-        pass
-        = A(SPAN('Previous', SPAN(' Transcription', _class='sr-only')), _href=URL(vars=dict(id=document.id, display=((display-2) % (count-1))+1)), _class='btn btn-info ', _id='prevT')
-        = A(SPAN('Next', SPAN(' Transcription', _class='sr-only')), _href=URL(vars=dict(id=document.id, display=(display % (count-1))+1)), _class='btn btn-info', _id='nextT')
-    }}
-
+            pass
+            = A(SPAN('Previous', SPAN(' Transcription', _class='sr-only')), _href=URL(vars=dict(id=document.id, display=((display-2) % (count-1))+1)), _class='btn btn-info docNavArrow docNavArrow-small', _id='prevT')
+            = A(SPAN('Next', SPAN(' Transcription', _class='sr-only')), _href=URL(vars=dict(id=document.id, display=(display % (count-1))+1)), _class='btn btn-info docNavArrow docNavArrow-small', _id='nextT')
+        }}
+    </div>
 </div>
 <div class="transFoot">
     {{=A(SPAN('Reject All Transcriptions'), _href=URL(vars=dict(id=document.id, accepted='reject')), _class='btn btn-danger btn-lg')}}
