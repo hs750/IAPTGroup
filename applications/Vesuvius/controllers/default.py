@@ -64,26 +64,26 @@ def create():
     #requirement form is separate, as the submit adds to a dropdown field
     requirementform = SQLFORM(db.requirements, submit_button='+')
     if requirementform.validate(keepvalues=True):
-        session.storeDetails = requirementform.vars
+        session.storeRequirements = requirementform.vars
 
     #upload form for images
     uploadform = SQLFORM(db.documents)
-    if uploadform.validate(keepvalues=True):
-        session.storeDetails = uploadform.vars
 
     #define the project form structure with all fields and validation
     projform = SQLFORM.factory(db.projects, db.keywords, submit_button='Next')
-    if projform.validate(keepvalues=True):
+    if projform.validate(keepvalues=True) & uploadform.validate(keepvalues=True):
         session.storeDetails = projform.vars
+        session.storeUpload = uploadform.vars
         response.js = "jQuery('.createone'.hide(); jQuery('.createtwo').show()"
-
     return dict(uploadform=uploadform, requirementform=requirementform, projform=projform)
 
 def createPartTwo():
     buttons = [TAG.button('Back', _type="button",_onClick = "jQuesry('.createtwo').hide(); jQuery('.createone').show()"), TAG.button('Submit',_type="submit")]
-    
     #create second part of upload wizard form
+    imageform = SQLFORM.factory(db.documents)
     
+    ##if imageform.validate(keepvalues=True):
+        
     ##insert into projects table
      ##   db.projects.insert(title=request.vars.title, description=request.vars.description, state='open', userID=auth.user.id)
         ##insert keywords into keywords table

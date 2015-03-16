@@ -13,22 +13,21 @@
     {{=requirementform.custom.begin}}
     <div><b> Requirements </b>{{=requirementform.custom.widget.name}} {{=requirementform.custom.submit}}</div>
     {{=requirementform.custom.end}}
-    
     <div><i>What do you require of people transcribing your documents? For example this can be 'date' or 'author' or 'full transcription'</i></div><br>
     {{=uploadform.custom.begin}}
-    <div><b>Upload images </b>{{=uploadform.custom.widget.image}} {{=uploadform.custom.submit}}</div>
+    <div><b>Upload images </b>{{=uploadform.custom.widget.image}}</div>
     {{=uploadform.custom.end}}
     <div><i>You must upload at least one document image to be transcribed</i></div><br>
     <div>{{=projform.custom.submit}}</div>
 {{=projform.custom.end}}
-    
+
 </div>
 
 <div class="createtwo hidden">
-    <h2>
-    Image Descriptions
-</h2>
-<div>
-    If you would like to change the title of your images from the file name, you can do so here. Image descriptions are optional but may provide useful information to other users transcribing your document.
-</div>
+    <h2>Image Descriptions</h2>
+    <div>If you would like to change the title of your images from the file name, you can do so here. Image descriptions are optional but may provide useful information to other users transcribing your document.</div>
+    <div id="secondform">
+        {{=LOAD('default', 'createPartTwo.load', ajax=True ,target='secondform')}}
+    </div>
+    
 </div>
