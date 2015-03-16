@@ -61,22 +61,42 @@ def index():
 # TODO : content here
 ## @auth.requires_login()
 def create():
-    
+    #requirement form is separate, as the submit adds to a dropdown field
+    requirementform = SQLFORM(db.requirements, submit_button='+')
+    if requirementform.validate(keepvalues=True):
+        session.storeDetails = requirementform.vars
+
+    #upload form for images
+    uploadform = SQLFORM(db.documents)
+    if uploadform.validate(keepvalues=True):
+        session.storeDetails = uploadform.vars
+
     #define the project form structure with all fields and validation
-    projform = SQLFORM.factory(db.projects, db.keywords, db.requirements)
-    if projform.accepts(request,session):
-        ##insert into projects table
-        db.projects.insert(title=request.vars.title, description=request.vars.description, state='open', userID=auth.user.id)
+    projform = SQLFORM.factory(db.projects, db.keywords, submit_button='Next')
+    if projform.validate(keepvalues=True):
+        session.storeDetails = projform.vars
+        response.js = "jQuery('.createone'.hide(); jQuery('.createtwo').show()"
+
+    return dict(uploadform=uploadform, requirementform=requirementform, projform=projform)
+
+def createPartTwo():
+    buttons = [TAG.button('Back', _type="button",_onClick = "jQuesry('.createtwo').hide(); jQuery('.createone').show()"), TAG.button('Submit',_type="submit")]
+    
+    #create second part of upload wizard form
+    
+    ##insert into projects table
+     ##   db.projects.insert(title=request.vars.title, description=request.vars.description, state='open', userID=auth.user.id)
         ##insert keywords into keywords table
-        db.keywords.insert(keyword=request.vars.keyword)
+##db.keywords.insert(keyword=request.vars.keyword)
         ##insert the requirements into the requirements table
         ##unsure how to do the requirements type reading from the form?
-        db.requirements.insert(name=request.vars.name, projectID=request.vars.id)
-        db.commit
-        response.flash = 'You have successfully created a project'
-    elif projform.errors:
-        response.flash = 'One or more of your fields have errors. See below for more information'
-    return dict(projform=projform)
+##db.requirements.insert(name=request.vars.name, projectID=request.vars.id)
+      ##  db.commit
+      ##response.flash = 'You have successfully created a project'
+    ##elif projform.errors:
+        ##response.flash = 'One or more of your fields have errors. See below for more information'
+    ##return dict()
+
 
 def liveSearch():
     searchStr = request.vars.values()[0]

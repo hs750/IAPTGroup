@@ -21,9 +21,9 @@ db.define_table(
 requirementTypes = ['Short Text', 'Long Text', 'Date', 'Number']
 db.define_table(
     'requirements',
-    Field('name', 'string', requires=IS_NOT_EMPTY()),
-    Field('type', 'string', requires=IS_IN_SET(requirementTypes), default=requirementTypes[0]),
-    Field('projectID', db.projects)
+    Field('name', 'string', label='Requirements', requires=IS_NOT_EMPTY()),
+    Field('type', 'string', requires=IS_IN_SET(requirementTypes), default=requirementTypes[0], writable=False, readable=False),
+    Field('projectID', db.projects, writable=False, readable=False)
 )
 
 db.define_table(
