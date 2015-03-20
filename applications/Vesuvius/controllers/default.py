@@ -11,6 +11,7 @@
 from operator import itemgetter
 from IAPTlib import addImagesToProjects
 from IAPTlib import searchProjects
+from IAPTlib import createReqDiv
 
 def index():
 
@@ -102,8 +103,15 @@ def createPartOne():
 
 # Part Two contains requirements
 def createPartTwo():
-    buttons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivTwo').hide(); jQuery('.createDivOne').show()"),TAG.button('Next',_type="submit")]
-    form = FORM(buttons)
+    # Create requirements form
+    form = FORM(DIV(LABEL('Requirements:', _for='basereq', _class="create-form-label"),
+        INPUT(_name='basereq', _id='basereq', _class='create-form-field', requires=IS_NOT_EMPTY()),
+        INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq();'),
+        BR(), DIV(_id='wrapper', _class='create-req-wrapper')), _id='reqForm')
+    
+    # Add form nav buttons
+    nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivTwo').hide(); jQuery('.createDivOne').show()"),TAG.button('Next',_type="submit")]
+    form.append(DIV(nextPrevButtons))
 
     if form.validate(keepvalues=True):
         response.js = "jQuery('.createDivTwo').hide(); jQuery('.createDivThree').show();"

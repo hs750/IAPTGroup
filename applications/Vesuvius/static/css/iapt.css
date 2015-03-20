@@ -309,3 +309,7 @@ input:read-only, textarea:read-only {
     width: 300px;
     position: relative;
 }
+
+.create-req-btn {
+    margin-bottom: 10px;
+}
