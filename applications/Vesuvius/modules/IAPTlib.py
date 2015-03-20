@@ -1,4 +1,4 @@
-from html import *
+from gluon import html
 
 ### DEVELOPER NOTE:
 # If you edit a web2py module (anything in the /modules/ folder) you must restart
