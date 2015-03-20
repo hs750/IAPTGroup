@@ -282,3 +282,26 @@ input:read-only, textarea:read-only {
 .docNavArrow-small .arrow-label {
     top: 0px;
 }
+
+.create-form-label {
+    float: left;
+    padding-right: 30px;
+    text-align: right;
+    display: block;
+    width: 120px;
+    height: 20px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.create-form-item {
+    margin-bottom: 20px;
+}
+
+.create-form-item .error_wrapper {
+    width: 120px;
+    left: 150px;
+    position: relative;
+}

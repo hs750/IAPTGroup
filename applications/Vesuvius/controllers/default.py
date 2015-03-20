@@ -61,6 +61,7 @@ def index():
 # TODO : content here
 ## @auth.requires_login()
 def create():
+
     #requirement form is separate, as the submit adds to a dropdown field
     requirementform = SQLFORM(db.requirements, submit_button='+')
     if requirementform.validate(keepvalues=True):
@@ -77,26 +78,38 @@ def create():
         response.js = "jQuery('.createone'.hide(); jQuery('.createtwo').show()"
     return dict(uploadform=uploadform, requirementform=requirementform, projform=projform)
 
-def createPartTwo():
-    buttons = [TAG.button('Back', _type="button",_onClick = "jQuesry('.createtwo').hide(); jQuery('.createone').show()"), TAG.button('Submit',_type="submit")]
-    #create second part of upload wizard form
-    imageform = SQLFORM.factory(db.documents)
-    
-    ##if imageform.validate(keepvalues=True):
-        
-    ##insert into projects table
-     ##   db.projects.insert(title=request.vars.title, description=request.vars.description, state='open', userID=auth.user.id)
-        ##insert keywords into keywords table
-##db.keywords.insert(keyword=request.vars.keyword)
-        ##insert the requirements into the requirements table
-        ##unsure how to do the requirements type reading from the form?
-##db.requirements.insert(name=request.vars.name, projectID=request.vars.id)
-      ##  db.commit
-      ##response.flash = 'You have successfully created a project'
-    ##elif projform.errors:
-        ##response.flash = 'One or more of your fields have errors. See below for more information'
-    ##return dict()
+# Part One contains title, description, keywords
+def createPartOne():
+    form = FORM(DIV(LABEL('Title:', _for='title', _class="create-form-label"),
+        INPUT(_name='title', _id='title', _class="create-form-field",requires=IS_NOT_EMPTY()),
+        BR(), I('A short title for your project', _class="create-form-alttext"), _class="create-form-item"),
+    DIV(LABEL('Description:', _for='description', _class="create-form-label"),
+        TEXTAREA(_name='description', _id='description', _rows = 3, _style ='width:300px;', _class="create-form-field",requires=IS_NOT_EMPTY()),
+        BR(), I('You can make the description as detailed as you like. It\'s purpose is to give people an introduction to the project.', _class="create-form-alttext"), _class="create-form-item"),
+    DIV(LABEL('Keywords:', _for='keywords', _class="create-form-label"),
+        INPUT(_name='keywords', _id='keywords', _class="create-form-field",requires=IS_NOT_EMPTY()),
+        BR(), I('Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas.', _class="create-form-alttext"), _class="create-form-item"),
+    INPUT(_type='submit', _id='create-next-button', _value='Next', _class='btn btn-primary'))
 
+    if form.validate(keepvalues=True):
+        response.js = "jQuery('.createDivOne').hide(); jQuery('.createDivTwo').show();"
+    return dict(form=form)
+
+# Part Two contains requirements
+def createPartTwo():
+    buttons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivTwo').hide(); jQuery('.createDivOne').show()"),TAG.button('Next',_type="submit")]
+    form = FORM(buttons)
+
+    if form.validate(keepvalues=True):
+        response.js = "jQuery('.createDivTwo').hide(); jQuery('.createDivThree').show();"
+    return dict(form=form)
+
+# Part Three contains image upload
+def createPartThree():
+    buttons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()"), TAG.button('Submit',_type="submit")]
+    form = FORM(buttons)
+    ## Submission
+    return dict(form=form)
 
 def liveSearch():
     searchStr = request.vars.values()[0]

@@ -1,33 +1,26 @@
 {{extend 'layout.html'}}
 
-<div class="createone">
-    <h2>Create a new project</h2>
-    <div>To create a new project, please fill in the required fields below</div><br>
-    {{=projform.custom.begin}}
-    <div><b>Title </b>{{=projform.custom.widget.title}}</div>
-    <div><i>A short title for your project</i></div><br>
-    <div><b>Description </b>{{=projform.custom.widget.description}}</div>
-    <div><i>You can make the description as detailed as you like. It's purpose is to give people an introduction to the project.</i></div><br>
-    <div><b>Keywords </b>{{=projform.custom.widget.keyword}}</div>
-    <div><i>Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas.</i></div><br>
-    {{=requirementform.custom.begin}}
-    <div><b> Requirements </b>{{=requirementform.custom.widget.name}} {{=requirementform.custom.submit}}</div>
-    {{=requirementform.custom.end}}
-    <div><i>What do you require of people transcribing your documents? For example this can be 'date' or 'author' or 'full transcription'</i></div><br>
-    {{=uploadform.custom.begin}}
-    <div><b>Upload images </b>{{=uploadform.custom.widget.image}}</div>
-    {{=uploadform.custom.end}}
-    <div><i>You must upload at least one document image to be transcribed</i></div><br>
-    <div>{{=projform.custom.submit}}</div>
-{{=projform.custom.end}}
-
-</div>
-
-<div class="createtwo hidden">
-    <h2>Image Descriptions</h2>
-    <div>If you would like to change the title of your images from the file name, you can do so here. Image descriptions are optional but may provide useful information to other users transcribing your document.</div>
-    <div id="secondform">
-        {{=LOAD('default', 'createPartTwo.load', ajax=True ,target='secondform')}}
+<div class="createDivOne">
+    <h3>Create a new Project</h3>
+    <p>To create a new project, please fill in the required fields below</p>
+    <div id="partOneForm">
+        {{=LOAD('default', 'createPartOne.load', ajax=True ,target='partOneForm')}}
     </div>
-    
 </div>
+
+<div class="createDivTwo hidden">
+    <h3>Requirements</h3>
+    <p>What do you require of people transcribing your documents? For example this can be 'date' or 'author' or 'full transcription'</p>
+    <div id="partTwoForm">
+        {{=LOAD('default', 'createPartTwo.load', ajax=True ,target='partTwoForm')}}
+    </div>
+</div>
+
+<div class="createDivThree hidden">
+    <h3>Document Images</h3>
+    <p>Upload the documents you want transcribed here. (You can add more later if you like)</p>
+    <div id="partTwoForm">
+        {{=LOAD('default', 'createPartThree.load', ajax=True ,target='partThreeForm')}}
+    </div>
+</div>
+
