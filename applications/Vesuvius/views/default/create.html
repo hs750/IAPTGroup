@@ -1,5 +1,11 @@
 {{extend 'layout.html'}}
 
+<!-- Load qQuery UI for tags to work. If you are using a debugger (Firebug etc) this will be slower
+    but not normally noticeable with normal usage-->
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="{{=URL('static','css/tagit.ui-zendesk.css')}}">
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" type="text/javascript"></script>
+
 <div class="createDivOne">
     <h3>Create a new Project</h3>
     <p>To create a new project, please fill in the required fields below</p>

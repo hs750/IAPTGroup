@@ -303,5 +303,9 @@ input:read-only, textarea:read-only {
 .create-form-item .error_wrapper {
     width: 120px;
     left: 150px;
+}
+
+.create-form-item ul {
+    width: 300px;
     position: relative;
 }

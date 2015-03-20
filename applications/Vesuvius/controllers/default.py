@@ -80,6 +80,7 @@ def create():
 
 # Part One contains title, description, keywords
 def createPartOne():
+    # Create form
     form = FORM(DIV(LABEL('Title:', _for='title', _class="create-form-label"),
         INPUT(_name='title', _id='title', _class="create-form-field",requires=IS_NOT_EMPTY()),
         BR(), I('A short title for your project', _class="create-form-alttext"), _class="create-form-item"),
@@ -87,10 +88,14 @@ def createPartOne():
         TEXTAREA(_name='description', _id='description', _rows = 3, _style ='width:300px;', _class="create-form-field",requires=IS_NOT_EMPTY()),
         BR(), I('You can make the description as detailed as you like. It\'s purpose is to give people an introduction to the project.', _class="create-form-alttext"), _class="create-form-item"),
     DIV(LABEL('Keywords:', _for='keywords', _class="create-form-label"),
-        INPUT(_name='keywords', _id='keywords', _class="create-form-field",requires=IS_NOT_EMPTY()),
+        INPUT(_name='keywords', _id='keywords', _class="create-form-field"),
         BR(), I('Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas.', _class="create-form-alttext"), _class="create-form-item"),
     INPUT(_type='submit', _id='create-next-button', _value='Next', _class='btn btn-primary'))
 
+    # Turn keywords input into a tagit field.
+    response.js = "$('#keywords').tagit();"
+
+    # If Next clicked and validated and open second part of form
     if form.validate(keepvalues=True):
         response.js = "jQuery('.createDivOne').hide(); jQuery('.createDivTwo').show();"
     return dict(form=form)
