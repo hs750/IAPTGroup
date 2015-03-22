@@ -25,8 +25,10 @@
 <div class="createDivThree hidden">
     <h3>Document Images</h3>
     <p>Upload the documents you want transcribed here. (You can add more later if you like)</p>
-    <div id="partTwoForm">
-        {{=LOAD('default', 'createPartThree.load', ajax=True ,target='partThreeForm')}}
+    <div id="partThreeForm">
+        {{=LOAD('default', 'createPartThree.load', ajax=True, target='partThreeForm')}}
+    </div>
+    <div id="documentsDisplay">
+        {{=LOAD('default', 'displayDocuments.load', ajax=True ,target='documentsDisplay')}}
     </div>
 </div>
-

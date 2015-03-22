@@ -1,0 +1,7 @@
+{{=form}}
+
+<script>
+/* hack because jquery.form.js does not properly pass headers */
+jQuery('.flash').hide().html("{{=response.flash}}").slideDown();
+eval("{{=XML(response.js or '')}}");
+</script>

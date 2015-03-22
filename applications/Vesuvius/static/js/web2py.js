@@ -250,34 +250,29 @@
         });
 
       },
+      /* Modification to trap_form made here in order to allow uploading of images within ajax component
+       * Suggested in book "web2py Application Developer Cookbook" page 142
+      */
       trap_form: function(action, target) {
-        /* traps any LOADed form */
-        $('#' + target + ' form').each(function(i) {
-          var form = $(this);
-          if(form.hasClass('no_trap')) {
-            return;
-          }
-          form.attr('data-w2p_target', target);
-          var url = form.attr('action');
-          if((url === "") || (url === "#") || (typeof url === 'undefined')) {
-            /* form has no action. Use component url. */
-            url = action;
-          }
-          form.submit(function(e) {
-            web2py.disableElement(form.find(web2py.formInputClickSelector));
-            web2py.hide_flash();
-            web2py.ajax_page('post', url, form.serialize(), target, form);
-            e.preventDefault();
-          });
-          form.on('click', web2py.formInputClickSelector, function(e) {
-            e.preventDefault();
-            var input_name = $(this).attr('name');
-            if(input_name != undefined) {
-              $('<input type="hidden" />').attr('name', input_name)
-                .attr('value', $(this).val()).appendTo(form)
+        jQuery('#'+target+' form').each(function(i){
+          var form=jQuery(this);
+          if(!form.hasClass('no_trap'))
+            if(form.find('.upload').length>0) {
+              form.ajaxForm({
+                url: action,
+                success: function(data, statusText, xhr) {
+                  jQuery('#'+target).html(xhr.responseText);
+                  web2py_trap_form(action,target);
+                  web2py_ajax_init();
+                }
+              });
+            } else {
+              form.submit(function(e){
+                jQuery('.flash').hide().html('');
+                web2py_ajax_page('post',action,form.serialize(),target);
+                e.preventDefault();
+              });
             }
-            form.trigger('submit');
-          });
         });
       },
       ajax_page: function(method, action, data, target, element) {

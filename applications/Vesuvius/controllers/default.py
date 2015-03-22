@@ -11,7 +11,6 @@
 from operator import itemgetter
 from IAPTlib import addImagesToProjects
 from IAPTlib import searchProjects
-from IAPTlib import createReqDiv
 
 def index():
 
@@ -90,8 +89,11 @@ def createPartOne():
         BR(), I('You can make the description as detailed as you like. It\'s purpose is to give people an introduction to the project.', _class="create-form-alttext"), _class="create-form-item"),
     DIV(LABEL('Keywords:', _for='keywords', _class="create-form-label"),
         INPUT(_name='keywords', _id='keywords', _class="create-form-field"),
-        BR(), I('Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas.', _class="create-form-alttext"), _class="create-form-item"),
-    INPUT(_type='submit', _id='create-next-button', _value='Next', _class='btn btn-primary'))
+        BR(), I('Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas.', _class="create-form-alttext"), _class="create-form-item"))
+
+
+    nextButton = [TAG.button('Next',_type="submit")]
+    form.append(DIV(nextButton))
 
     # Turn keywords input into a tagit field.
     response.js = "$('#keywords').tagit();"
@@ -119,10 +121,41 @@ def createPartTwo():
 
 # Part Three contains image upload
 def createPartThree():
-    buttons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()"), TAG.button('Submit',_type="submit")]
-    form = FORM(buttons)
+    # Create upload form
+    form = FORM(DIV(LABEL('Upload Files:', _for='upload', _class="create-form-label"),
+        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='',_class='upload create-form-field'),BR()), _id='uploadForm')
+    #form = SQLFORM(db.documents)
+
+    nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()"), TAG.button('Submit',_type="submit")]
+    form.append(DIV(nextPrevButtons))
+
+
+    # Create a dummy form to handle the file upload
+    #form = SQLFORM.factory(Field('uploadField', 'upload'), buttons=nextPrevButtons)
+
+
+    if form.accepts(request.vars):
+        files = request.vars['uploadFiles']
+        # If singular file and not multiple, make into list
+        if not isinstance(files, list):
+            files = [files]
+        # Commit document images to db
+        for f in files:
+            print f.filename
+            #uploadedFile = db.documents.image.store(f, f.filename)
+            #i = db.documents.insert(image=uploadedFile, title="testtitle", state="open", projectID=1, description="testdesc")
+            #db.commit()
+
+        #response.js = "web2py_component('%s','doc_list');" % \
+        #URL('displayDocuments.load')
+
     ## Submission
     return dict(form=form)
+
+def displayDocuments():
+    db.documents.image.represent = lambda f,r: f and A('file',_href\
+        =URL('download',args=f))
+    return db(db.documents).select()
 
 def liveSearch():
     searchStr = request.vars.values()[0]
