@@ -10,7 +10,7 @@
     <h3>Create a new Project</h3>
     <p>To create a new project, please fill in the required fields below</p>
     <div id="partOneForm">
-        {{=LOAD('default', 'createPartOne.load', ajax=True ,target='partOneForm')}}
+        {{=LOAD('default', 'createPartOne.load', ajax=True, user_signature=True, target='partOneForm')}}
     </div>
 </div>
 
@@ -18,7 +18,7 @@
     <h3>Requirements</h3>
     <p>What do you require of people transcribing your documents? For example this can be 'date' or 'author' or 'full transcription'</p>
     <div id="partTwoForm">
-        {{=LOAD('default', 'createPartTwo.load', ajax=True ,target='partTwoForm')}}
+        {{=LOAD('default', 'createPartTwo.load', ajax=True, user_signature=True, target='partTwoForm')}}
     </div>
 </div>
 
@@ -26,9 +26,9 @@
     <h3>Document Images</h3>
     <p>Upload the documents you want transcribed here. (You can add more later if you like)</p>
     <div id="partThreeForm">
-        {{=LOAD('default', 'createPartThree.load', ajax=True, target='partThreeForm')}}
+        {{=LOAD('default', 'createPartThree.load', ajax=True, user_signature=True, target='partThreeForm')}}
     </div>
     <div id="documentsDisplay">
-        {{=LOAD('default', 'displayDocuments.load', ajax=True ,target='documentsDisplay')}}
+        {{=LOAD('default', 'displayDocuments.load', ajax=True, user_signature=True, target='documentsDisplay')}}
     </div>
 </div>
