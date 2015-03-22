@@ -57,7 +57,7 @@ def index():
 
     return dict(new=newest, topFive=topFive)
 
-## @auth.requires_login()
+@auth.requires_login()
 def create():
     # Clean temporary variables
     session.tempVars = {}
