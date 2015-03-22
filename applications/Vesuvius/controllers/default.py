@@ -57,26 +57,12 @@ def index():
 
     return dict(new=newest, topFive=topFive)
 
-
-# TODO : content here
 ## @auth.requires_login()
 def create():
-
-    #requirement form is separate, as the submit adds to a dropdown field
-    requirementform = SQLFORM(db.requirements, submit_button='+')
-    if requirementform.validate(keepvalues=True):
-        session.storeRequirements = requirementform.vars
-
-    #upload form for images
-    uploadform = SQLFORM(db.documents)
-
-    #define the project form structure with all fields and validation
-    projform = SQLFORM.factory(db.projects, db.keywords, submit_button='Next')
-    if projform.validate(keepvalues=True) & uploadform.validate(keepvalues=True):
-        session.storeDetails = projform.vars
-        session.storeUpload = uploadform.vars
-        response.js = "jQuery('.createone'.hide(); jQuery('.createtwo').show()"
-    return dict(uploadform=uploadform, requirementform=requirementform, projform=projform)
+    # Clean temporary variables
+    session.tempVars = {}
+    db(db.tempUpload.sessionID == response.session_id).delete()
+    return dict()
 
 # Part One contains title, description, keywords
 def createPartOne():
@@ -89,7 +75,7 @@ def createPartOne():
         BR(), I('You can make the description as detailed as you like. It\'s purpose is to give people an introduction to the project.', _class="create-form-alttext"), _class="create-form-item"),
     DIV(LABEL('Keywords:', _for='keywords', _class="create-form-label"),
         INPUT(_name='keywords', _id='keywords', _class="create-form-field"),
-        BR(), I('Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas.', _class="create-form-alttext"), _class="create-form-item"))
+        BR(), I('Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas or spaces.', _class="create-form-alttext"), _class="create-form-item"))
 
 
     nextButton = [TAG.button('Next',_type="submit")]
@@ -100,6 +86,12 @@ def createPartOne():
 
     # If Next clicked and validated and open second part of form
     if form.validate(keepvalues=True):
+        # Save vars in session
+        session.tempVars['title'] = form.vars.title
+        session.tempVars['desc'] = form.vars.description
+        session.tempVars['keywords'] = form.vars.keywords
+
+        # Go to next part of form
         response.js = "jQuery('.createDivOne').hide(); jQuery('.createDivTwo').show();"
     return dict(form=form)
 
@@ -108,54 +100,115 @@ def createPartTwo():
     # Create requirements form
     form = FORM(DIV(LABEL('Requirements:', _for='basereq', _class="create-form-label"),
         INPUT(_name='basereq', _id='basereq', _class='create-form-field', requires=IS_NOT_EMPTY()),
-        INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq();'),
+        INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq($("#basereq").val());'),
         BR(), DIV(_id='wrapper', _class='create-req-wrapper')), _id='reqForm')
     
     # Add form nav buttons
-    nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivTwo').hide(); jQuery('.createDivOne').show()"),TAG.button('Next',_type="submit")]
+    nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivTwo').hide(); jQuery('.createDivOne').show(); $('#keywords').tagit();"),TAG.button('Next',_type="submit")]
     form.append(DIV(nextPrevButtons))
 
     if form.validate(keepvalues=True):
+        # Add base requirement to the others for submission.
+        reqs = [form.vars.basereq]
+        if 'requirements' in session.tempVars:
+            for r in session.tempVars['requirements']:
+                reqs.append(r)
+        session.tempVars['requirements'] = reqs
+
+        # Go to next part of form
         response.js = "jQuery('.createDivTwo').hide(); jQuery('.createDivThree').show();"
     return dict(form=form)
 
-# Part Three contains image upload
+# Part Three contains image upload, though they are displayed in a seperate component.
 def createPartThree():
     # Create upload form
-    form = FORM(DIV(LABEL('Upload Files:', _for='upload', _class="create-form-label"),
-        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='',_class='upload create-form-field'),BR()), _id='uploadForm')
-    #form = SQLFORM(db.documents)
+    form = FORM(DIV(LABEL('Add Files:', _for='upload', _class="create-form-label"),
+        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='',_class='upload create-form-field'),
+        BR()), _id='uploadForm')
 
-    nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()"), TAG.button('Submit',_type="submit")]
-    form.append(DIV(nextPrevButtons))
+    # Upload button
+    uploadButton = TAG.button('Upload',_type="submit")
+    form.append(uploadButton)
 
-
-    # Create a dummy form to handle the file upload
-    #form = SQLFORM.factory(Field('uploadField', 'upload'), buttons=nextPrevButtons)
-
-
+    # If files are uploaded
     if form.accepts(request.vars):
+        # Get files
         files = request.vars['uploadFiles']
         # If singular file and not multiple, make into list
         if not isinstance(files, list):
             files = [files]
-        # Commit document images to db
+        # For each file uploaded:
         for f in files:
-            print f.filename
-            #uploadedFile = db.documents.image.store(f, f.filename)
-            #i = db.documents.insert(image=uploadedFile, title="testtitle", state="open", projectID=1, description="testdesc")
-            #db.commit()
-
-        #response.js = "web2py_component('%s','doc_list');" % \
-        #URL('displayDocuments.load')
-
-    ## Submission
+            uploadedFile = db.tempUpload.image.store(f, f.filename)
+            i = db.tempUpload.insert(image=uploadedFile, sessionID=response.session_id)
+            db.commit()
+        # Reload component to show uploaded files and edit info
+        response.js = "jQuery('#documentsDisplay').get(0).reload();"
     return dict(form=form)
 
+# displayDocuments allows users to give info about doc images they just uploaded.
+# Its submit button creates the project.
 def displayDocuments():
-    db.documents.image.represent = lambda f,r: f and A('file',_href\
-        =URL('download',args=f))
-    return db(db.documents).select()
+    # Get documents that have been uploaded
+    documents = db(db.tempUpload.sessionID == response.session_id).select()
+
+    divWrapper = DIV(_class='create-form-doc-wrapper')
+    # Construct divs for each document
+    for index, doc in enumerate(documents):
+        # Get image and filename
+        (filename, stream) = db.tempUpload.image.retrieve(doc.image)
+        # For each document, we need to construct a form for setting title and description.
+        # Unique ids are also required so we use the index of the loop.
+        docImg = IMG(_src=URL('default', 'getImage', args=[doc.image]), _id='docimg%s' % index, _class='create-form-doc-img')
+        docTitle = DIV(LABEL('Title:', _for='doctitle%s' % index, _class="create-form-label"),
+            INPUT(_name='title%s' % index, _value=filename,_id='doctitle%s' % index, _class="create-form-field", requires=IS_NOT_EMPTY()),
+            _class='create-form-doc-title')
+        docDesc = DIV(LABEL('Description:', _for='docdesc%s' % index, _class="create-form-label"),
+            TEXTAREA(_name='desc%s' % index, _id='docdesc%s' % index, _rows = 3, _style ='width:300px;', _class="create-form-field", requires=IS_NOT_EMPTY()),
+            _class='create-form-doc-desc')
+        docItem = DIV(docImg, docTitle, docDesc, _id='docitem%s' % index,_class='create-form-doc-item')
+        # Append item to the wrapper div
+        divWrapper.append(docItem)
+
+    # Construct the form containing all doc items.
+    form = FORM(divWrapper)
+    # Add form nav buttons
+    nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()"),TAG.button('Submit',_type="submit")]
+    form.append(DIV(nextPrevButtons))
+
+    # If form accepts, process all data
+    if form.accepts(request.vars):
+        # Create project
+        newProj = db.projects.insert(title=session.tempVars['title'], description=session.tempVars['desc'], state='open',userID=auth.user)
+
+        # Add project keywords
+        keywords = session.tempVars['keywords'].split(',')
+        for k in keywords:
+            key = db.keywords.insert(keyword=k)
+            db.projectKeywords.insert(keywordID=key.id, projectID=newProj.id)
+
+        # Add requirements
+        requirements = session.tempVars['requirements']
+        for r in requirements:
+            db.requirements.insert(name=r, type='Short Text', projectID=newProj.id)
+
+        # Add documents
+        for index, doc in enumerate(documents):
+            # Fetch values from form
+            docTitle = request.vars['title%s' % index]
+            docDesc = request.vars['desc%s' % index]
+            db.documents.insert(title=docTitle,description=docDesc,image=doc.image,state='open',projectID=newProj.id)
+
+        # Creation is done, return to home page?
+        redirect(URL('default', 'index', extension='html'), client_side=True)
+
+    return dict(form=form)
+
+# Web2py doesnt seem to have any way of accessing form input variables that werent present during creation
+# So this keeps a sepearate list to refer to.
+def updateReqs():
+    session.tempVars['requirements'] = request.vars.values()[0]
+    return dict()
 
 def liveSearch():
     searchStr = request.vars.values()[0]

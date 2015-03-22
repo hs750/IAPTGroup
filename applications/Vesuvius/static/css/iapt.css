@@ -313,3 +313,30 @@ input:read-only, textarea:read-only {
 .create-req-btn {
     margin-bottom: 10px;
 }
+
+.create-form-doc-img {
+    width: 120px;
+    height: 180px;
+    float: left;
+}
+
+.create-form-doc-wrapper {
+    height: 500px;
+    overflow: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.create-form-doc-item {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    float: left;
+    height: auto;
+    width: 75%;
+    border: solid 1px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 40px;
+}

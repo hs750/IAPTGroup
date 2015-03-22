@@ -263,7 +263,6 @@
                 success: function(data, statusText, xhr) {
                   jQuery('#'+target).html(xhr.responseText);
                   web2py_trap_form(action,target);
-                  web2py_ajax_init();
                 }
               });
             } else {

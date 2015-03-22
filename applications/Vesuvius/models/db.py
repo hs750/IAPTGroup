@@ -54,3 +54,8 @@ db.define_table(
     Field('keywordID', db.keywords),
     Field('projectID', db.projects)
 )
+
+db.define_table(
+    'tempUpload',
+    Field('sessionID', 'text'),
+    Field('image', 'upload', requires=[IS_IMAGE(), IS_NOT_EMPTY()]))
