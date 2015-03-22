@@ -123,7 +123,7 @@ def createPartTwo():
 def createPartThree():
     # Create upload form
     form = FORM(DIV(LABEL('Add Files:', _for='upload', _class="create-form-label"),
-        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='',_class='upload create-form-field'),
+        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='',_class='upload create-form-field',  requires=IS_LIST_OF(IS_IMAGE())),
         BR()), _id='uploadForm')
 
     # Upload button
@@ -189,6 +189,7 @@ def displayDocuments():
 
         # Add requirements
         requirements = session.tempVars['requirements']
+        print requirements
         for r in requirements:
             db.requirements.insert(name=r, type='Short Text', projectID=newProj.id)
 
@@ -208,6 +209,7 @@ def displayDocuments():
 # So this keeps a sepearate list to refer to.
 def updateReqs():
     session.tempVars['requirements'] = request.vars.values()[0]
+    print session.tempVars['requirements']
     return dict()
 
 def liveSearch():
