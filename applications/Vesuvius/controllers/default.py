@@ -123,7 +123,7 @@ def createPartTwo():
 def createPartThree():
     # Create upload form
     form = FORM(DIV(LABEL('Add Files:', _for='upload', _class="create-form-label"),
-        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='',_class='upload create-form-field',  requires=IS_LIST_OF(IS_IMAGE())),
+        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='',_class='upload create-form-field'),
         BR()), _id='uploadForm')
 
     # Upload button
