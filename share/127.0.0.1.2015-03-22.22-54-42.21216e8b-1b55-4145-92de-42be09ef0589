@@ -1,0 +1,399 @@
+(dp1
+S'output'
+p2
+S"<type 'exceptions.Exception'> Validation error, field:uploadFiles <gluon.validators.IS_LIST_OF object at 0x08192390>"
+p3
+sS'layer'
+p4
+S'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\applications\\Vesuvius\\controllers/default.py'
+p5
+sS'code'
+p6
+S'# -*- coding: utf-8 -*-\n# this file is released under public domain and you can use without limitations\n\n#########################################################################\n## This is a sample controller\n## - index is the default action of any application\n## - user is required for authentication and authorization\n## - download is for downloading files uploaded in the db (does streaming)\n## - api is an example of Hypermedia API support and access control\n#########################################################################\nfrom operator import itemgetter\nfrom IAPTlib import addImagesToProjects\nfrom IAPTlib import searchProjects\n\ndef index():\n\n    # The newest 5 projects\n    newest = db((db.projects.id > 0) &\n                (db.projects.state == projectStates[0])).select(orderby=~db.projects.id, limitby=(0, 5))\n\n    # The most popular projects\n    # \'Popular\' means projests which have the highest ratio of documents completed.\n    allDocs = db(db.documents.id > 0 ).select()\n    projectDocs = dict()\n    projectCompletedDocs = dict()\n\n    for doc in allDocs:\n        projID = doc.projectID\n        docsForProj = projectDocs.get(projID, 0)\n        projectDocs[projID] = docsForProj + 1\n        if doc.state == documentStates[1]:\n            compDocForProj = projectCompletedDocs.get(projID, 0)\n            projectCompletedDocs[projID] = compDocForProj + 1\n\n    projPercentateComplete = dict()\n\n    for projID in projectDocs.keys():\n        projCompleted = float(projectCompletedDocs.get(projID, 0)) / float(projectDocs.get(projID))\n        projPercentateComplete[projID] = projCompleted\n\n    projPercentateComplete = projPercentateComplete.items()\n\n    # Projects ordered by popularity, highest first\n    projPercentateComplete = sorted(projPercentateComplete, key=itemgetter(1), reverse=True)\n\n    # Top 5 must popular projects\n    projPercentateComplete = projPercentateComplete[0:5]\n\n    topFiveIDs = []\n    for i in range(0,min(5, len(projPercentateComplete))):\n        topFiveIDs.append(projPercentateComplete[i][0])\n\n    topFive = db(db.projects.id.belongs(topFiveIDs) & (db.projects.state == projectStates[0])).select()\n\n    newest = addImagesToProjects(newest, db)\n    topFive = addImagesToProjects(topFive, db)\n\n    return dict(new=newest, topFive=topFive)\n\n@auth.requires_login()\ndef create():\n    # Clean temporary variables\n    session.tempVars = {}\n    db(db.tempUpload.sessionID == response.session_id).delete()\n    return dict()\n\n# Part One contains title, description, keywords\ndef createPartOne():\n    # Create form\n    form = FORM(DIV(LABEL(\'Title:\', _for=\'title\', _class="create-form-label"),\n        INPUT(_name=\'title\', _id=\'title\', _class="create-form-field",requires=IS_NOT_EMPTY()),\n        BR(), I(\'A short title for your project\', _class="create-form-alttext"), _class="create-form-item"),\n    DIV(LABEL(\'Description:\', _for=\'description\', _class="create-form-label"),\n        TEXTAREA(_name=\'description\', _id=\'description\', _rows = 3, _style =\'width:300px;\', _class="create-form-field",requires=IS_NOT_EMPTY()),\n        BR(), I(\'You can make the description as detailed as you like. It\\\'s purpose is to give people an introduction to the project.\', _class="create-form-alttext"), _class="create-form-item"),\n    DIV(LABEL(\'Keywords:\', _for=\'keywords\', _class="create-form-label"),\n        INPUT(_name=\'keywords\', _id=\'keywords\', _class="create-form-field"),\n        BR(), I(\'Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas or spaces.\', _class="create-form-alttext"), _class="create-form-item"))\n\n\n    nextButton = [TAG.button(\'Next\',_type="submit")]\n    form.append(DIV(nextButton))\n\n    # Turn keywords input into a tagit field.\n    response.js = "$(\'#keywords\').tagit();"\n\n    # If Next clicked and validated and open second part of form\n    if form.validate(keepvalues=True):\n        # Save vars in session\n        session.tempVars[\'title\'] = form.vars.title\n        session.tempVars[\'desc\'] = form.vars.description\n        session.tempVars[\'keywords\'] = form.vars.keywords\n\n        # Go to next part of form\n        response.js = "jQuery(\'.createDivOne\').hide(); jQuery(\'.createDivTwo\').show();"\n    return dict(form=form)\n\n# Part Two contains requirements\ndef createPartTwo():\n    # Create requirements form\n    form = FORM(DIV(LABEL(\'Requirements:\', _for=\'basereq\', _class="create-form-label"),\n        INPUT(_name=\'basereq\', _id=\'basereq\', _class=\'create-form-field\', requires=IS_NOT_EMPTY()),\n        INPUT(_value=\'+\', _type=\'button\', _class=\'create-req-btn\', _onClick=\'addReq($("#basereq").val());\'),\n        BR(), DIV(_id=\'wrapper\', _class=\'create-req-wrapper\')), _id=\'reqForm\')\n    \n    # Add form nav buttons\n    nextPrevButtons = [TAG.button(\'Back\', _type="button",_onClick = "jQuery(\'.createDivTwo\').hide(); jQuery(\'.createDivOne\').show(); $(\'#keywords\').tagit();"),TAG.button(\'Next\',_type="submit")]\n    form.append(DIV(nextPrevButtons))\n\n    if form.validate(keepvalues=True):\n        # Add base requirement to the others for submission.\n        reqs = [form.vars.basereq]\n        if \'requirements\' in session.tempVars:\n            for r in session.tempVars[\'requirements\']:\n                reqs.append(r)\n        session.tempVars[\'requirements\'] = reqs\n\n        # Go to next part of form\n        response.js = "jQuery(\'.createDivTwo\').hide(); jQuery(\'.createDivThree\').show();"\n    return dict(form=form)\n\n# Part Three contains image upload, though they are displayed in a seperate component.\ndef createPartThree():\n    # Create upload form\n    form = FORM(DIV(LABEL(\'Add Files:\', _for=\'upload\', _class="create-form-label"),\n        INPUT(_name=\'uploadFiles\', _id=\'uploadField\', _type=\'file\', _multiple=\'\',_class=\'upload create-form-field\',  requires=IS_LIST_OF(IS_IMAGE())),\n        BR()), _id=\'uploadForm\')\n\n    # Upload button\n    uploadButton = TAG.button(\'Upload\',_type="submit")\n    form.append(uploadButton)\n\n    # If files are uploaded\n    if form.accepts(request.vars):\n        # Get files\n        files = request.vars[\'uploadFiles\']\n        # If singular file and not multiple, make into list\n        if not isinstance(files, list):\n            files = [files]\n        # For each file uploaded:\n        for f in files:\n            uploadedFile = db.tempUpload.image.store(f, f.filename)\n            i = db.tempUpload.insert(image=uploadedFile, sessionID=response.session_id)\n            db.commit()\n        # Reload component to show uploaded files and edit info\n        response.js = "jQuery(\'#documentsDisplay\').get(0).reload();"\n    return dict(form=form)\n\n# displayDocuments allows users to give info about doc images they just uploaded.\n# Its submit button creates the project.\ndef displayDocuments():\n    # Get documents that have been uploaded\n    documents = db(db.tempUpload.sessionID == response.session_id).select()\n\n    divWrapper = DIV(_class=\'create-form-doc-wrapper\')\n    # Construct divs for each document\n    for index, doc in enumerate(documents):\n        # Get image and filename\n        (filename, stream) = db.tempUpload.image.retrieve(doc.image)\n        # For each document, we need to construct a form for setting title and description.\n        # Unique ids are also required so we use the index of the loop.\n        docImg = IMG(_src=URL(\'default\', \'getImage\', args=[doc.image]), _id=\'docimg%s\' % index, _class=\'create-form-doc-img\')\n        docTitle = DIV(LABEL(\'Title:\', _for=\'doctitle%s\' % index, _class="create-form-label"),\n            INPUT(_name=\'title%s\' % index, _value=filename,_id=\'doctitle%s\' % index, _class="create-form-field", requires=IS_NOT_EMPTY()),\n            _class=\'create-form-doc-title\')\n        docDesc = DIV(LABEL(\'Description:\', _for=\'docdesc%s\' % index, _class="create-form-label"),\n            TEXTAREA(_name=\'desc%s\' % index, _id=\'docdesc%s\' % index, _rows = 3, _style =\'width:300px;\', _class="create-form-field", requires=IS_NOT_EMPTY()),\n            _class=\'create-form-doc-desc\')\n        docItem = DIV(docImg, docTitle, docDesc, _id=\'docitem%s\' % index,_class=\'create-form-doc-item\')\n        # Append item to the wrapper div\n        divWrapper.append(docItem)\n\n    # Construct the form containing all doc items.\n    form = FORM(divWrapper)\n    # Add form nav buttons\n    nextPrevButtons = [TAG.button(\'Back\', _type="button",_onClick = "jQuery(\'.createDivThree\').hide(); jQuery(\'.createDivTwo\').show()"),TAG.button(\'Submit\',_type="submit")]\n    form.append(DIV(nextPrevButtons))\n\n    # If form accepts, process all data\n    if form.accepts(request.vars):\n        # Create project\n        newProj = db.projects.insert(title=session.tempVars[\'title\'], description=session.tempVars[\'desc\'], state=\'open\',userID=auth.user)\n\n        # Add project keywords\n        keywords = session.tempVars[\'keywords\'].split(\',\')\n        for k in keywords:\n            key = db.keywords.insert(keyword=k)\n            db.projectKeywords.insert(keywordID=key.id, projectID=newProj.id)\n\n        # Add requirements\n        requirements = session.tempVars[\'requirements\']\n        for r in requirements:\n            db.requirements.insert(name=r, type=\'Short Text\', projectID=newProj.id)\n\n        # Add documents\n        for index, doc in enumerate(documents):\n            # Fetch values from form\n            docTitle = request.vars[\'title%s\' % index]\n            docDesc = request.vars[\'desc%s\' % index]\n            db.documents.insert(title=docTitle,description=docDesc,image=doc.image,state=\'open\',projectID=newProj.id)\n\n        # Creation is done, return to home page?\n        redirect(URL(\'default\', \'index\', extension=\'html\'), client_side=True)\n\n    return dict(form=form)\n\n# Web2py doesnt seem to have any way of accessing form input variables that werent present during creation\n# So this keeps a sepearate list to refer to.\ndef updateReqs():\n    session.tempVars[\'requirements\'] = request.vars.values()[0]\n    return dict()\n\ndef liveSearch():\n    searchStr = request.vars.values()[0]\n    projects = searchProjects(searchStr, db)\n    addImagesToProjects(projects, db)\n    items = []\n    for (i, project) in enumerate(projects):\n        nameDiv = H4(project.title, _class="liveSearchResultTileTitle", _id="res%s"%i)\n        imgDiv = DIV(IMG(_src=URL(\'default\', \'getImage\', args=[project.image]), _alt=project.imageAlt), _class="liveSearchResultTileImg")\n        descDiv = DIV(project.description, _class="liveSearchResultTileDesc")\n        items.append(A(nameDiv, imgDiv, descDiv, _href="#", _onclick="copyIntoSearch($(\'#res%s\').html())"%i, _class="liveSearchResult"))\n    return TAG[\'\'](*items)\n\ndef dashboard():\n    return index()\n\ndef browse():\n    if request.vars.search is None:\n        searchTerms = \'\'\n    else:\n        searchTerms = request.vars.search\n\n    results = searchProjects(searchTerms, db)\n    searchForm = FORM(INPUT(_type=\'search\', _placeholder=\'Search\', _name=\'searchField\'),\n                      INPUT(_type=\'submit\', _value=\'Search\', _name=\'searchSubmit\'),\n                      _name=\'searchForm\',\n                      _class=\'form-inline\',\n                      _id=\'searchForm\')\n\n    if searchForm.accepts(request.post_vars):\n        redirect(URL(vars=dict(search=request.post_vars.searchField)))\n\n    results = addImagesToProjects(results, db)\n    return dict(form=searchForm, projects=results)\n\ndef user():\n    """\n    exposes:\n    http://..../[app]/default/user/login\n    http://..../[app]/default/user/logout\n    http://..../[app]/default/user/register\n    http://..../[app]/default/user/profile\n    http://..../[app]/default/user/retrieve_password\n    http://..../[app]/default/user/change_password\n    http://..../[app]/default/user/manage_users (requires membership in\n    use @auth.requires_login()\n        @auth.requires_membership(\'group name\')\n        @auth.requires_permission(\'read\',\'table name\',record_id)\n    to decorate functions that need access control\n    """\n    return dict(form=auth())\n\n\n@cache.action()\ndef download():\n    """\n    allows downloading of uploaded files\n    http://..../[app]/default/download/[filename]\n    """\n    return response.download(request, db)\n\n\ndef call():\n    """\n    exposes services. for example:\n    http://..../[app]/default/call/jsonrpc\n    decorate with @services.jsonrpc the functions to expose\n    supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv\n    """\n    return service()\n\n\n@auth.requires_login() \ndef api():\n    """\n    this is example of API with access control\n    WEB2PY provides Hypermedia API (Collection+JSON) Experimental\n    """\n    from gluon.contrib.hypermedia import Collection\n    rules = {\n        \'<tablename>\': {\'GET\':{},\'POST\':{},\'PUT\':{},\'DELETE\':{}},\n        }\n    return Collection(db).process(request,response,rules)\n\ndef getImage():\n    """\n    Get an image. Which image to get is stored in request.\n    This method should only be called as part of a URL for displaying images on the page\n    :return: the  image\n    """\n    return response.download(request, db)\n\nresponse._vars=response._caller(createPartThree)\n'
+p7
+sS'snapshot'
+p8
+(dp9
+S'exception'
+p10
+(dp11
+S'__hash__'
+p12
+S"<method-wrapper '__hash__' of exceptions.Exception object>"
+p13
+sS'__setattr__'
+p14
+S"<method-wrapper '__setattr__' of exceptions.Exception object>"
+p15
+sS'__reduce_ex__'
+p16
+S'<built-in method __reduce_ex__ of exceptions.Exception object>'
+p17
+sS'__getslice__'
+p18
+S"<method-wrapper '__getslice__' of exceptions.Exception object>"
+p19
+sS'__getitem__'
+p20
+S"<method-wrapper '__getitem__' of exceptions.Exception object>"
+p21
+sS'__setstate__'
+p22
+S'<built-in method __setstate__ of exceptions.Exception object>'
+p23
+sS'__reduce__'
+p24
+S'<built-in method __reduce__ of exceptions.Exception object>'
+p25
+sS'__str__'
+p26
+S"<method-wrapper '__str__' of exceptions.Exception object>"
+p27
+sS'__format__'
+p28
+S'<built-in method __format__ of exceptions.Exception object>'
+p29
+sS'__getattribute__'
+p30
+S"<method-wrapper '__getattribute__' of exceptions.Exception object>"
+p31
+sS'__class__'
+p32
+S"<type 'exceptions.Exception'>"
+p33
+sS'__unicode__'
+p34
+S'<built-in method __unicode__ of exceptions.Exception object>'
+p35
+sS'__delattr__'
+p36
+S"<method-wrapper '__delattr__' of exceptions.Exception object>"
+p37
+sS'__subclasshook__'
+p38
+S'<built-in method __subclasshook__ of type object>'
+p39
+sS'__repr__'
+p40
+S"<method-wrapper '__repr__' of exceptions.Exception object>"
+p41
+sS'args'
+p42
+S"('Validation error, field:uploadFiles <gluon.validators.IS_LIST_OF object at 0x08192390>',)"
+p43
+sS'__dict__'
+p44
+S'{}'
+p45
+sS'__sizeof__'
+p46
+S'<built-in method __sizeof__ of exceptions.Exception object>'
+p47
+sS'__doc__'
+p48
+S"'Common base class for all non-exit exceptions.'"
+p49
+sS'__init__'
+p50
+S"<method-wrapper '__init__' of exceptions.Exception object>"
+p51
+sS'__new__'
+p52
+S'<built-in method __new__ of type object>'
+p53
+ssS'evalue'
+p54
+S'Validation error, field:uploadFiles <gluon.validators.IS_LIST_OF object at 0x08192390>'
+p55
+sS'request'
+p56
+cgluon.html
+XML_unpickle
+p57
+(S's\xd8p\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">ajax</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">application</td><td style="vertical-align:top;">:</td><td><div>Vesuvius</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cid</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">client</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">controller</td><td style="vertical-align:top;">:</td><td><div>default</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">adblock</td><td style="vertical-align:top;">:</td><td><div>0<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_admin</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-b3a2d527-7007-40fc-8976-8cbca1b0cd60<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_vesuvius</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-41ba819a-95d9-4e4a-b6d4-3e9f6b4211c2<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_welcome</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-5d98d81d-187d-410a-990f-c5996370a14c<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">env</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">CONTENT_LENGTH</td><td style="vertical-align:top;">:</td><td><div>135136</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">CONTENT_TYPE</td><td style="vertical-align:top;">:</td><td><div>multipart/form-data; boundary=---------------------------2781078468308</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT</td><td style="vertical-align:top;">:</td><td><div>*/*</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_ENCODING</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_LANGUAGE</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.5</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CACHE_CONTROL</td><td style="vertical-align:top;">:</td><td><div>no-cache</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONNECTION</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONTENT_LENGTH</td><td style="vertical-align:top;">:</td><td><div>135136</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONTENT_TYPE</td><td style="vertical-align:top;">:</td><td><div>multipart/form-data; boundary=---------------------------2781078468308</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_COOKIE</td><td style="vertical-align:top;">:</td><td><div>adblock=0; _ga=GA1.1.427603281.1426809249; session_id_welcome=127.0.0.1-5d98d81d-187d-410a-990f-c5996370a14c; session_id_admin=127.0.0.1-b3a2d527-7007-40fc-8976-8cbca1b0cd60; session_id_vesuvius=127.0.0.1-41ba819a-95d9-4e4a-b6d4-3e9f6b4211c2</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_HOST</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1:8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_PRAGMA</td><td style="vertical-align:top;">:</td><td><div>no-cache</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_REFERER</td><td style="vertical-align:top;">:</td><td><div>http://127.0.0.1:8000/Vesuvius/default/create</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_USER_AGENT</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (Windows NT 6.1; WOW64; rv:36.0) Gecko/20100101 Firefox/36.0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_X_REQUESTED_WITH</td><td style="vertical-align:top;">:</td><td><div>XMLHttpRequest</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">PATH_INFO</td><td style="vertical-align:top;">:</td><td><div>/Vesuvius/default/createPartThree.load</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">QUERY_STRING</td><td style="vertical-align:top;">:</td><td><div>_signature=ae022b4b94f00a531315b72d6236ea75bdc4bc70</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_ADDR</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_PORT</td><td style="vertical-align:top;">:</td><td><div>2034</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_METHOD</td><td style="vertical-align:top;">:</td><td><div>POST</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SCRIPT_NAME</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_NAME</td><td style="vertical-align:top;">:</td><td><div>Charles-PC</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PORT</td><td style="vertical-align:top;">:</td><td><div>8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PROTOCOL</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_SOFTWARE</td><td style="vertical-align:top;">:</td><td><div>Rocket 1.2.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;C:\\\\Users\\\\Charles\\\\Documents\\\\UniYr4\\\\IAPT\\\\web2py\\\\applications\\\\welcome\\\\&#x27;, &#x27;C:\\\\Users\\\\Charles\\\\Documents\\\\UniYr4\\\\IAPT\\\\web2py\\\\applications\\\\admin\\\\&#x27;, &#x27;C:\\\\Users\\\\Charles\\\\Documents\\\\UniYr4\\\\IAPT\\\\web2py\\\\applications\\\\Vesuvius\\\\&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_options</td><td style="vertical-align:top;">:</td><td><div>&lt;Values at 0x24b35d0: {&#x27;verbose&#x27;: False, &#x27;ip&#x27;: &#x27;127.0.0.1&#x27;, &#x27;debuglevel&#x27;: 30, &#x27;with_scheduler&#x27;: False, &#x27;ips&#x27;: [&#x27;fe80::44e7:ff6d:b4c2:5c25%11&#x27;, &#x27;fe80::c494:19e8:fd1d:27ce%14&#x27;, &#x27;10.0.1.20&#x27;, &#x27;2620:9b::190d:334f&#x27;, &#x27;192.168.76.1&#x27;, &#x27;fe80::75df:f9dd:da77:81%25&#x27;, &#x27;10.0.1.11&#x27;, &#x27;fe80::edad:7:1fa1:f90b%24&#x27;, &#x27;192.168.209.1&#x27;, &#x27;25.13.51.79&#x27;, &#x27;fe80::a140:6aa0:85e5:7b42%12&#x27;], &#x27;shutdown_timeout&#x27;: 5, &#x27;taskbar&#x27;: False, &#x27;with_coverage&#x27;: False, &#x27;scheduler_groups&#x27;: None, &#x27;port&#x27;: 8000, &#x27;maxthreads&#x27;: None, &#x27;softcron&#x27;: False, &#x27;server_name&#x27;: &#x27;Charles-PC&#x27;, &#x27;bpython&#x27;: False, &#x27;nogui&#x27;: False, &#x27;pid_filename&#x27;: &#x27;httpserver.pid&#x27;, &#x27;extcron&#x27;: False, &#x27;runcron&#x27;: False, &#x27;run_system_tests&#x27;: False, &#x27;test&#x27;: None, &#x27;folder&#x27;: &#x27;C:\\\\Users\\\\Charles\\\\Documents\\\\UniYr4\\\\IAPT\\\\web2py&#x27;, &#x27;config&#x27;: &#x27;&#x27;, &#x27;minthreads&#x27;: None, &#x27;shell&#x27;: None, &#x27;run&#x27;: &#x27;&#x27;, &#x27;log_filename&#x27;: &#x27;httpserver.log&#x27;, &#x27;profiler_dir&#x27;: None, &#x27;args&#x27;: [&#x27;&#x27;], &#x27;socket_timeout&#x27;: 5, &#x27;ssl_ca_certificate&#x27;: None, &#x27;scheduler&#x27;: None, &#x27;interfaces&#x27;: None, &#x27;ssl_private_key&#x27;: &#x27;&#x27;, &#x27;gae&#x27;: None, &#x27;password&#x27;: &#x27;&lt;ask&gt;&#x27;, &#x27;request_queue_size&#x27;: 5, &#x27;ssl_certificate&#x27;: &#x27;&#x27;, &#x27;cronjob&#x27;: False, &#x27;numthreads&#x27;: None, &#x27;quiet&#x27;: False, &#x27;import_models&#x27;: False, &#x27;timeout&#x27;: 10, &#x27;plain&#x27;: False, &#x27;nobanner&#x27;: False}&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">content_length</td><td style="vertical-align:top;">:</td><td><div>135136</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">content_type</td><td style="vertical-align:top;">:</td><td><div>multipart/form-data; boundary=---------------------------2781078468308</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept</td><td style="vertical-align:top;">:</td><td><div>*/*</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_encoding</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_language</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.5</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_cache_control</td><td style="vertical-align:top;">:</td><td><div>no-cache</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_connection</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_content_length</td><td style="vertical-align:top;">:</td><td><div>135136</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_content_type</td><td style="vertical-align:top;">:</td><td><div>multipart/form-data; boundary=---------------------------2781078468308</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_cookie</td><td style="vertical-align:top;">:</td><td><div>adblock=0; _ga=GA1.1.427603281.1426809249; session_id_welcome=127.0.0.1-5d98d81d-187d-410a-990f-c5996370a14c; session_id_admin=127.0.0.1-b3a2d527-7007-40fc-8976-8cbca1b0cd60; session_id_vesuvius=127.0.0.1-41ba819a-95d9-4e4a-b6d4-3e9f6b4211c2</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_host</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1:8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_pragma</td><td style="vertical-align:top;">:</td><td><div>no-cache</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_referer</td><td style="vertical-align:top;">:</td><td><div>http://127.0.0.1:8000/Vesuvius/default/create</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_user_agent</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (Windows NT 6.1; WOW64; rv:36.0) Gecko/20100101 Firefox/36.0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_x_requested_with</td><td style="vertical-align:top;">:</td><td><div>XMLHttpRequest</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>fe80::44e7:ff6d:b4c2:5c25%11</div></td></tr><tr><td><div>fe80::c494:19e8:fd1d:27ce%14</div></td></tr><tr><td><div>Charles-PC</div></td></tr><tr><td><div>10.0.1.20</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>2620:9b::190d:334f</div></td></tr><tr><td><div>192.168.76.1</div></td></tr><tr><td><div>fe80::75df:f9dd:da77:81%25</div></td></tr><tr><td><div>10.0.1.11</div></td></tr><tr><td><div>25.13.51.79</div></td></tr><tr><td><div>fe80::edad:7:1fa1:f90b%24</div></td></tr><tr><td><div>192.168.209.1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr><tr><td><div>fe80::a140:6aa0:85e5:7b42%12</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path_info</td><td style="vertical-align:top;">:</td><td><div>/Vesuvius/default/createPartThree.load</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">query_string</td><td style="vertical-align:top;">:</td><td><div>_signature=ae022b4b94f00a531315b72d6236ea75bdc4bc70</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_addr</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_port</td><td style="vertical-align:top;">:</td><td><div>2034</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_method</td><td style="vertical-align:top;">:</td><td><div>POST</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_uri</td><td style="vertical-align:top;">:</td><td><div>/Vesuvius/default/createPartThree.load?_signature=ae022b4b94f00a531315b72d6236ea75bdc4bc70</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">script_name</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_name</td><td style="vertical-align:top;">:</td><td><div>Charles-PC</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_port</td><td style="vertical-align:top;">:</td><td><div>8000</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_protocol</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_software</td><td style="vertical-align:top;">:</td><td><div>Rocket 1.2.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_path</td><td style="vertical-align:top;">:</td><td><div>C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.9.11-stable+timestamp.2014.09.15.23.35.11</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;&lt;stderr&gt;&#x27;, mode &#x27;w&#x27; at 0x01DC60D0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;class wsgiref.util.FileWrapper at 0x032EAC70&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.input</td><td style="vertical-align:top;">:</td><td><div>&lt;socket._fileobject object at 0x079F6830&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multiprocess</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multithread</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;&lt;stderr&gt;&#x27;, mode &#x27;w&#x27; at 0x01DC60D0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;class wsgiref.util.FileWrapper at 0x032EAC70&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_input</td><td style="vertical-align:top;">:</td><td><div>&lt;socket._fileobject object at 0x079F6830&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multiprocess</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multithread</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">extension</td><td style="vertical-align:top;">:</td><td><div>load</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">folder</td><td style="vertical-align:top;">:</td><td><div>C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\applications\\Vesuvius\\</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">function</td><td style="vertical-align:top;">:</td><td><div>createPartThree</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">global_settings</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;C:\\\\Users\\\\Charles\\\\Documents\\\\UniYr4\\\\IAPT\\\\web2py\\\\applications\\\\welcome\\\\&#x27;, &#x27;C:\\\\Users\\\\Charles\\\\Documents\\\\UniYr4\\\\IAPT\\\\web2py\\\\applications\\\\admin\\\\&#x27;, &#x27;C:\\\\Users\\\\Charles\\\\Documents\\\\UniYr4\\\\IAPT\\\\web2py\\\\applications\\\\Vesuvius\\\\&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cmd_options</td><td style="vertical-align:top;">:</td><td><div>&lt;Values at 0x24b35d0: {&#x27;verbose&#x27;: False, &#x27;ip&#x27;: &#x27;127.0.0.1&#x27;, &#x27;debuglevel&#x27;: 30, &#x27;with_scheduler&#x27;: False, &#x27;ips&#x27;: [&#x27;fe80::44e7:ff6d:b4c2:5c25%11&#x27;, &#x27;fe80::c494:19e8:fd1d:27ce%14&#x27;, &#x27;10.0.1.20&#x27;, &#x27;2620:9b::190d:334f&#x27;, &#x27;192.168.76.1&#x27;, &#x27;fe80::75df:f9dd:da77:81%25&#x27;, &#x27;10.0.1.11&#x27;, &#x27;fe80::edad:7:1fa1:f90b%24&#x27;, &#x27;192.168.209.1&#x27;, &#x27;25.13.51.79&#x27;, &#x27;fe80::a140:6aa0:85e5:7b42%12&#x27;], &#x27;shutdown_timeout&#x27;: 5, &#x27;taskbar&#x27;: False, &#x27;with_coverage&#x27;: False, &#x27;scheduler_groups&#x27;: None, &#x27;port&#x27;: 8000, &#x27;maxthreads&#x27;: None, &#x27;softcron&#x27;: False, &#x27;server_name&#x27;: &#x27;Charles-PC&#x27;, &#x27;bpython&#x27;: False, &#x27;nogui&#x27;: False, &#x27;pid_filename&#x27;: &#x27;httpserver.pid&#x27;, &#x27;extcron&#x27;: False, &#x27;runcron&#x27;: False, &#x27;run_system_tests&#x27;: False, &#x27;test&#x27;: None, &#x27;folder&#x27;: &#x27;C:\\\\Users\\\\Charles\\\\Documents\\\\UniYr4\\\\IAPT\\\\web2py&#x27;, &#x27;config&#x27;: &#x27;&#x27;, &#x27;minthreads&#x27;: None, &#x27;shell&#x27;: None, &#x27;run&#x27;: &#x27;&#x27;, &#x27;log_filename&#x27;: &#x27;httpserver.log&#x27;, &#x27;profiler_dir&#x27;: None, &#x27;args&#x27;: [&#x27;&#x27;], &#x27;socket_timeout&#x27;: 5, &#x27;ssl_ca_certificate&#x27;: None, &#x27;scheduler&#x27;: None, &#x27;interfaces&#x27;: None, &#x27;ssl_private_key&#x27;: &#x27;&#x27;, &#x27;gae&#x27;: None, &#x27;password&#x27;: &#x27;&lt;ask&gt;&#x27;, &#x27;request_queue_size&#x27;: 5, &#x27;ssl_certificate&#x27;: &#x27;&#x27;, &#x27;cronjob&#x27;: False, &#x27;numthreads&#x27;: None, &#x27;quiet&#x27;: False, &#x27;import_models&#x27;: False, &#x27;timeout&#x27;: 10, &#x27;plain&#x27;: False, &#x27;nobanner&#x27;: False}&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>fe80::44e7:ff6d:b4c2:5c25%11</div></td></tr><tr><td><div>fe80::c494:19e8:fd1d:27ce%14</div></td></tr><tr><td><div>Charles-PC</div></td></tr><tr><td><div>10.0.1.20</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>2620:9b::190d:334f</div></td></tr><tr><td><div>192.168.76.1</div></td></tr><tr><td><div>fe80::75df:f9dd:da77:81%25</div></td></tr><tr><td><div>10.0.1.11</div></td></tr><tr><td><div>25.13.51.79</div></td></tr><tr><td><div>fe80::edad:7:1fa1:f90b%24</div></td></tr><tr><td><div>192.168.209.1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr><tr><td><div>fe80::a140:6aa0:85e5:7b42%12</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.9.11-stable+timestamp.2014.09.15.23.35.11</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_https</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_local</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_restful</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_sheduler</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_shell</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">now</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2015, 3, 22, 22, 54, 42, 523000)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_args</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_extension</td><td style="vertical-align:top;">:</td><td><div>load</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">url</td><td style="vertical-align:top;">:</td><td><div>/Vesuvius/default/createPartThree.load</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">utcnow</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2015, 3, 22, 22, 54, 42, 524000)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uuid</td><td style="vertical-align:top;">:</td><td><div>Vesuvius/127.0.0.1.2015-03-22.22-54-42.21216e8b-1b55-4145-92de-42be09ef0589</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi</td><td style="vertical-align:top;">:</td><td><div>&lt;gluon.main.LazyWSGI object at 0x07D65090&gt;</div></td></tr></table></div>'
+tRp58
+sS'frames'
+p59
+(lp60
+(dp61
+S'file'
+p62
+S'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\gluon\\restricted.py'
+p63
+sS'dump'
+p64
+(dp65
+sS'lnum'
+p66
+I224
+sS'lines'
+p67
+(dp68
+sS'call'
+p69
+S"(code='# -*- coding: utf-8 -*-\\n# this file is released ...response._vars=response._caller(createPartThree)\\n', environment={'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'ASSIGNJS': <function ASSIGNJS>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, 'CAT': <class 'gluon.html.CAT'>, ...}, layer=r'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\applications\\Vesuvius\\controllers/default.py')"
+p70
+sS'func'
+p71
+S'restricted'
+p72
+sa(dp73
+g62
+S'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\applications\\Vesuvius\\controllers\\default.py'
+p74
+sg64
+(dp75
+sg66
+I304
+sg67
+(dp76
+I293
+S'        }'
+p77
+sI294
+S'    return Collection(db).process(request,response,rules)'
+p78
+sI295
+S''
+sI296
+S'def getImage():'
+p79
+sI297
+S'    """'
+p80
+sI298
+S'    Get an image. Which image to get is stored in request.'
+p81
+sI299
+S'    This method should only be called as part of a URL for displaying images on the page'
+p82
+sI300
+S'    :return: the  image'
+p83
+sI301
+S'    """'
+p84
+sI302
+S'    return response.download(request, db)'
+p85
+ssg69
+S'()'
+p86
+sg71
+S'<module>'
+p87
+sa(dp88
+g62
+S'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\gluon\\globals.py'
+p89
+sg64
+(dp90
+sg66
+I392
+sg67
+(dp91
+sg69
+S'(f=<function createPartThree>)'
+p92
+sg71
+S'<lambda>'
+p93
+sa(dp94
+g62
+S'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\applications\\Vesuvius\\controllers\\default.py'
+p95
+sg64
+(dp96
+S'global request'
+p97
+S"<Storage {'_vars': <Storage {'uploadFiles': [Fie...UniYr4\\\\IAPT\\\\web2py\\\\applications\\\\Vesuvius\\\\'}>"
+p98
+sS'request.vars'
+p99
+S"<Storage {'uploadFiles': [FieldStorage('uploadFi...15b72d6236ea75bdc4bc70', '_formname': 'default'}>"
+p100
+sS'form'
+p101
+S'<gluon.html.FORM object>'
+p102
+sS'form.accepts'
+p103
+S'<bound method FORM.accepts of <gluon.html.FORM object>>'
+p104
+ssg66
+I134
+sg67
+(dp105
+I129
+S'    # Upload button'
+p106
+sI130
+S'    uploadButton = TAG.button(\'Upload\',_type="submit")'
+p107
+sI131
+S'    form.append(uploadButton)'
+p108
+sI132
+S''
+sI133
+S'    # If files are uploaded'
+p109
+sI134
+S'    if form.accepts(request.vars):'
+p110
+sI135
+S'        # Get files'
+p111
+sI136
+S"        files = request.vars['uploadFiles']"
+p112
+sI137
+S'        # If singular file and not multiple, make into list'
+p113
+sI138
+S'        if not isinstance(files, list):'
+p114
+ssg69
+S'()'
+p115
+sg71
+S'createPartThree'
+p116
+sa(dp117
+g62
+S'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\gluon\\html.py'
+p118
+sg64
+(dp119
+sg66
+I2121
+sg67
+(dp120
+sg69
+S"(self=<gluon.html.FORM object>, request_vars=<Storage {'_formname': 'default', '_signature': ...110\\xcdB\\xdd\\xeaV\\xebQ7\\x19\\xa4j\\x8f\\xff\\xd9')]}>, session=None, formname='default', keepvalues=False, onvalidation=None, hideerror=False, **kwargs={})"
+p121
+sg71
+S'accepts'
+p122
+sa(dp123
+g62
+S'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\gluon\\html.py'
+p124
+sg64
+(dp125
+sg66
+I885
+sg67
+(dp126
+sg69
+S'(self=<gluon.html.FORM object>, status=True, hideerror=False)'
+p127
+sg71
+S'_traverse'
+p128
+sa(dp129
+g62
+S'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\gluon\\html.py'
+p130
+sg64
+(dp131
+sg66
+I885
+sg67
+(dp132
+sg69
+S'(self=<gluon.html.DIV object>, status=True, hideerror=False)'
+p133
+sg71
+g128
+sa(dp134
+g62
+S'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\gluon\\html.py'
+p135
+sg64
+(dp136
+sg66
+I892
+sg67
+(dp137
+sg69
+S'(self=<gluon.html.INPUT object>, status=True, hideerror=False)'
+p138
+sg71
+g128
+sa(dp139
+g62
+S'C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\gluon\\html.py'
+p140
+sg64
+(dp141
+sg66
+I1860
+sg67
+(dp142
+sg69
+S'(self=<gluon.html.INPUT object>)'
+p143
+sg71
+S'_validate'
+p144
+sasS'pyver'
+p145
+S'Python 2.7.6: C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\web2py.exe (prefix: C:\\Python27)'
+p146
+sS'session'
+p147
+g57
+(S's_\x0b\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">auth</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">expiration</td><td style="vertical-align:top;">:</td><td><div>3600</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">hmac_key</td><td style="vertical-align:top;">:</td><td><div>9fc9a98e-47bb-4588-8822-c08aa205c178</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_visit</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2015, 3, 22, 22, 52, 50, 776000)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">email</td><td style="vertical-align:top;">:</td><td><div>chaz@c.com</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">first_name</td><td style="vertical-align:top;">:</td><td><div>chaz</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">id</td><td style="vertical-align:top;">:</td><td><div>4L</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_name</td><td style="vertical-align:top;">:</td><td><div>tudor</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_id</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">reset_password_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">username</td><td style="vertical-align:top;">:</td><td><div>chazt</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user_groups</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">returnURL</td><td style="vertical-align:top;">:</td><td><div>http://127.0.0.1:8000/Vesuvius/default/index</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">tempVars</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">desc</td><td style="vertical-align:top;">:</td><td><div>sadasd</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">keywords</td><td style="vertical-align:top;">:</td><td><div>sadsad</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">requirements</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>single</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">title</td><td style="vertical-align:top;">:</td><td><div>testrrr</div></td></tr></table></div></td></tr></table></div>'
+tRp148
+sS'etype'
+p149
+S"<type 'exceptions.Exception'>"
+p150
+sS'date'
+p151
+S'Sun Mar 22 22:54:42 2015'
+p152
+sS'response'
+p153
+g57
+(S's\xda\x1f\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">body</td><td style="vertical-align:top;">:</td><td><div>&lt;cStringIO.StringO object at 0x07D71220&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_vesuvius</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-41ba819a-95d9-4e4a-b6d4-3e9f6b4211c2<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div>/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">delimiters</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>{{</div></td></tr><tr><td><div>}}</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">files</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">form_label_separator</td><td style="vertical-align:top;">:</td><td><div>: </div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">formstyle</td><td style="vertical-align:top;">:</td><td><div>table3cols</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generic_patterns</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>*</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">google_analytics_id</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">headers</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">X-Powered-By</td><td style="vertical-align:top;">:</td><td><div>web2py</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">logo</td><td style="vertical-align:top;">:</td><td><div><a class="brand" href="http://www.web2py.com/"><b>web<span>2</span>py</b>&trade;&nbsp;</a></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">menu</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div><table><tr><td><div>Home</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/Vesuvius/default/index.load</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Create</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/Vesuvius/default/create.load</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Browse</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/Vesuvius/default/browse.load</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Dashboard</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/Vesuvius/user/dashboard.load</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">meta</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">author</td><td style="vertical-align:top;">:</td><td><div>Your Name &lt;you@example.com&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generator</td><td style="vertical-align:top;">:</td><td><div>Web2py Web Framework</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">keywords</td><td style="vertical-align:top;">:</td><td><div>web2py, python, framework</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">models_to_run</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>^\\w+\\.py$</div></td></tr><tr><td><div>^default/\\w+\\.py$</div></td></tr><tr><td><div>^default/createPartThree/\\w+\\.py$</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">postprocessing</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_client</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_compression_level</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_expires</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_key</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_data_name</td><td style="vertical-align:top;">:</td><td><div>session_data_vesuvius</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_file</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;C:\\\\Users\\\\Charles\\\\Documents\\\\UniYr4\\\\IAPT\\\\web2py\\\\applications\\\\Vesuvius\\\\sessions\\\\039\\\\1c7\\\\127.0.0.1-41ba819a-95d9-4e4a-b6d4-3e9f6b4211c2&#x27;, mode &#x27;rb+&#x27; at 0x0800ED30&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_filename</td><td style="vertical-align:top;">:</td><td><div>C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\applications\\Vesuvius\\sessions\\127.0.0.1-41ba819a-95d9-4e4a-b6d4-3e9f6b4211c2</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_hash</td><td style="vertical-align:top;">:</td><td><div>b870233547a26cae524ee6e637d4687b</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id</td><td style="vertical-align:top;">:</td><td><div>127.0.0.1-41ba819a-95d9-4e4a-b6d4-3e9f6b4211c2</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_name</td><td style="vertical-align:top;">:</td><td><div>session_id_vesuvius</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_locked</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_masterapp</td><td style="vertical-align:top;">:</td><td><div>Vesuvius</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_new</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_storage_type</td><td style="vertical-align:top;">:</td><td><div>file</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">status</td><td style="vertical-align:top;">:</td><td><div>200</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">subtitle</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">title</td><td style="vertical-align:top;">:</td><td><div>Vesuvius</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">view</td><td style="vertical-align:top;">:</td><td><div>default/createPartThree.load</div></td></tr></table></div>'
+tRp154
+sS'locals'
+p155
+(dp156
+S'name'
+p157
+S"'uploadFiles'"
+p158
+sS'k'
+S'0'
+sS'value'
+p159
+S"[FieldStorage('uploadFiles', 'Jurassicpark.jpg', ...1Wb\\xae\\xc5]\\x8a\\xbb\\x15v*\\xecU\\xd8\\xab\\xff\\xd9'), FieldStorage('uploadFiles', 'off-button-10074129...d\\x110\\xcdB\\xdd\\xeaV\\xebQ7\\x19\\xa4j\\x8f\\xff\\xd9')]"
+p160
+sS'validator'
+p161
+S'<gluon.validators.IS_LIST_OF object>'
+p162
+sS'msg'
+p163
+S"'Validation error, field:uploadFiles <gluon.validators.IS_LIST_OF object at 0x08192390>'"
+p164
+sS'request_vars_get'
+p165
+S'<built-in method get of Storage object>'
+p166
+sS'requires'
+p167
+S'[<gluon.validators.IS_LIST_OF object>]'
+p168
+sS'self'
+p169
+S'<gluon.html.INPUT object>'
+p170
+sssS'traceback'
+p171
+S'Traceback (most recent call last):\n  File "gluon/restricted.py", line 224, in restricted\n  File "C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\applications\\Vesuvius\\controllers/default.py", line 304, in <module>\n  File "gluon/globals.py", line 392, in <lambda>\n  File "C:\\Users\\Charles\\Documents\\UniYr4\\IAPT\\web2py\\applications\\Vesuvius\\controllers/default.py", line 134, in createPartThree\n    if form.accepts(request.vars):\n  File "gluon/html.py", line 2121, in accepts\n  File "gluon/html.py", line 885, in _traverse\n  File "gluon/html.py", line 885, in _traverse\n  File "gluon/html.py", line 892, in _traverse\n  File "gluon/html.py", line 1860, in _validate\nException: Validation error, field:uploadFiles <gluon.validators.IS_LIST_OF object at 0x08192390>\n'
+p172
+s.
