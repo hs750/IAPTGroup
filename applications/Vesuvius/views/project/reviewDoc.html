@@ -32,7 +32,7 @@
             count = 1
             display = int(request.vars.get('display', 1))
             for trans in userTranscriptions:
-                form = getTranscribeReviewForm(False, trans.transcriptions, True)
+                (form, c) = getTranscribeReviewForm(False, trans.transcriptions, True)
                 acceptBtn = DIV(A('Accept', SPAN(' Transcription ' + str(count), _class='sr-only'), _href=URL(vars=dict(id=document.id, accepted=count)), _class='btn btn-success'), _class='acceptBtn')
 
                 =DIV(H3('Transcription ' + str(count)), form, acceptBtn, _class='transForm reviewForm', _hidden=(count != display), _id='trans'+str(count))

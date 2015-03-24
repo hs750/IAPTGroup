@@ -22,8 +22,8 @@ def transcribe():
     (numDocs, nextDocID, prevDocID, currentDocIndex) = getNextAndPrevious(docsInProj, document.id)
 
     # Generate the form
-    form = getTranscribeReviewForm(True, requirements, False)
-    form.append(DIV(DIV(INPUT(_name='submit', _type='submit'), _class='controls'), _class='control-group'))
+    (form, rCount) = getTranscribeReviewForm(True, requirements, False)
+    form.append(DIV(DIV(INPUT(_value='Submit Transcription', _name='submit', _type='submit', _class='btn btn-primary'), _class='controls'), _class='control-group'))
 
     if form.accepts(request.post_vars):
         # Insert each requirement transcription into the database

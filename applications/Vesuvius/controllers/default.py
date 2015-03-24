@@ -67,11 +67,11 @@ def create():
 # Part One contains title, description, keywords
 def createPartOne():
     # Create form
-    form = FORM(DIV(LABEL('Title:', _for='title', _class="create-form-label"),
+    form = FORM(DIV(LABEL('Title: *', _for='title', _class="create-form-label"),
         INPUT(_name='title', _id='title', _class="create-form-field",requires=IS_NOT_EMPTY()),
         BR(), I('A short title for your project', _class="create-form-alttext"), _class="create-form-item"),
     DIV(LABEL('Description:', _for='description', _class="create-form-label"),
-        TEXTAREA(_name='description', _id='description', _rows = 3, _style ='width:300px;', _class="create-form-field",requires=IS_NOT_EMPTY()),
+        TEXTAREA(_name='description', _id='description', _rows = 3, _style ='width:300px;', _class="create-form-field"),
         BR(), I('You can make the description as detailed as you like. It\'s purpose is to give people an introduction to the project.', _class="create-form-alttext"), _class="create-form-item"),
     DIV(LABEL('Keywords:', _for='keywords', _class="create-form-label"),
         INPUT(_name='keywords', _id='keywords', _class="create-form-field"),
@@ -98,7 +98,7 @@ def createPartOne():
 # Part Two contains requirements
 def createPartTwo():
     # Create requirements form
-    form = FORM(DIV(LABEL('Requirements:', _for='basereq', _class="create-form-label"),
+    form = FORM(DIV(LABEL('Requirements: *', _for='basereq', _class="create-form-label"),
         INPUT(_name='basereq', _id='basereq', _class='create-form-field', requires=IS_NOT_EMPTY()),
         INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq($("#basereq").val());'),
         BR(), DIV(_id='wrapper', _class='create-req-wrapper')), _id='reqForm')
@@ -122,8 +122,8 @@ def createPartTwo():
 # Part Three contains image upload, though they are displayed in a seperate component.
 def createPartThree():
     # Create upload form
-    form = FORM(DIV(LABEL('Add Files:', _for='upload', _class="create-form-label"),
-        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='',_class='upload create-form-field',  requires=IS_LIST_OF(IS_IMAGE())),
+    form = FORM(DIV(LABEL('Add Files: *', _for='upload', _class="create-form-label"),
+        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='',_class='upload create-form-field'),
         BR()), _id='uploadForm')
 
     # Upload button
@@ -184,13 +184,16 @@ def displayDocuments():
         # Add project keywords
         keywords = session.tempVars['keywords'].split(',')
         for k in keywords:
-            key = db.keywords.insert(keyword=k)
+            if db(db.keywords.keyword == k).isempty():
+                key = db.keywords.insert(keyword=k)
+            else:
+                key = db(db.keywords.keyword == k).select().first()
             db.projectKeywords.insert(keywordID=key.id, projectID=newProj.id)
 
         # Add requirements
         requirements = session.tempVars['requirements']
         for r in requirements:
-            db.requirements.insert(name=r, type='Short Text', projectID=newProj.id)
+            db.requirements.insert(name=r, type='Long Text', projectID=newProj.id)
 
         # Add documents
         for index, doc in enumerate(documents):

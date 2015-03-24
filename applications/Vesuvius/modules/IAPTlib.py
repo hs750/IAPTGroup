@@ -75,4 +75,4 @@ def getTranscribeReviewForm(enabled, requirements, valuesInc):
         ctrlGroup.append(DIV(input, _class='controls'))
         form.append(ctrlGroup)
         rCount += 1
-    return form
+    return (form, rCount)
