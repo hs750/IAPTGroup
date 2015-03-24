@@ -184,7 +184,10 @@ def displayDocuments():
         # Add project keywords
         keywords = session.tempVars['keywords'].split(',')
         for k in keywords:
-            key = db.keywords.insert(keyword=k)
+            if db(db.keywords.keyword == k).isempty():
+                key = db.keywords.insert(keyword=k)
+            else:
+                key = db(db.keywords.keyword == k).select().first()
             db.projectKeywords.insert(keywordID=key.id, projectID=newProj.id)
 
         # Add requirements
