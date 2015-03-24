@@ -193,7 +193,7 @@ def displayDocuments():
         # Add requirements
         requirements = session.tempVars['requirements']
         for r in requirements:
-            db.requirements.insert(name=r, type='Short Text', projectID=newProj.id)
+            db.requirements.insert(name=r, type='Long Text', projectID=newProj.id)
 
         # Add documents
         for index, doc in enumerate(documents):
