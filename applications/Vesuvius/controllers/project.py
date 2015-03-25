@@ -88,7 +88,7 @@ def reviewDoc():
         user.transcriptions = db((db.contributions.documentID == docID) &
                                  (db.contributions.userID == user.userID) &
                                  (db.contributions.requirementID == db.requirements.id)).select(
-            db.requirements.type.with_alias('type'), db.requirements.name.with_alias('name'),
+            db.requirements.name.with_alias('name'),
             db.contributions.content.with_alias('content'), db.contributions.id.with_alias('contribID')
         )
 

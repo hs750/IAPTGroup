@@ -62,16 +62,7 @@ def getTranscribeReviewForm(enabled, requirements, valuesInc):
         intputName = 'req-' + str(rCount)
         ctrlGroup = DIV(_class='control-group')
         ctrlGroup.append(LABEL(req.name, _for=intputName, _class='control-label'))
-        input = INPUT(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
-        if req.type == 'Short Text':
-            input = INPUT(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
-        elif req.type == 'Long Text':
-            input = TEXTAREA(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled), _onkeyup='textAreaAutoResize(this, 300)')
-        elif req.type == 'Date':
-            input = INPUT(_name=intputName, _type='date', value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
-        elif req.type == 'Number':
-            input = INPUT(_name=intputName, _type='number', value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
-
+        input = TEXTAREA(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled), _onkeyup='textAreaAutoResize(this, 300)')
         ctrlGroup.append(DIV(input, _class='controls'))
         form.append(ctrlGroup)
         rCount += 1

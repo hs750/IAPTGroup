@@ -18,11 +18,9 @@ db.define_table(
     Field('userID', db.auth_user, writable=False, readable=False)
 )
 
-requirementTypes = ['Short Text', 'Long Text', 'Date', 'Number']
 db.define_table(
     'requirements',
     Field('name', 'string', label='Requirements', requires=IS_NOT_EMPTY()),
-    Field('type', 'string', requires=IS_IN_SET(requirementTypes), default=requirementTypes[0], writable=False, readable=False),
     Field('projectID', db.projects, writable=False, readable=False)
 )
 
