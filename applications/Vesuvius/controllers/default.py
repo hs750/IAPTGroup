@@ -137,6 +137,8 @@ def createPartThree():
         # If singular file and not multiple, make into list
         if not isinstance(files, list):
             files = [files]
+
+        errorMessage = ''
         # For each file uploaded:
         for f in files:
             # Check file type
@@ -146,7 +148,9 @@ def createPartThree():
                 db.commit()
             else:
                 # Not a supported image.
-                response.flash = 'Supported file types: jpeg, png, gif, bmp'
+                errorMessage += f.filename + ', '
+        if errorMessage != '':
+            form.errors.uploadFiles = errorMessage + 'are not supported file types.'
         # Reload component to show uploaded files and edit info
         response.js = "jQuery('#documentsDisplay').get(0).reload();"
     return dict(form=form)
