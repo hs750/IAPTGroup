@@ -139,9 +139,14 @@ def createPartThree():
             files = [files]
         # For each file uploaded:
         for f in files:
-            uploadedFile = db.tempUpload.image.store(f, f.filename)
-            i = db.tempUpload.insert(image=uploadedFile, sessionID=response.session_id)
-            db.commit()
+            # Check file type
+            if (f.filename.split(".")[-1].lower() in ['jpeg', 'png', 'jpg', 'gif', 'bmp']):
+                uploadedFile = db.tempUpload.image.store(f, f.filename)
+                i = db.tempUpload.insert(image=uploadedFile, sessionID=response.session_id)
+                db.commit()
+            else:
+                # Not a supported image.
+                response.flash = 'Supported file types: jpeg, png, gif, bmp'
         # Reload component to show uploaded files and edit info
         response.js = "jQuery('#documentsDisplay').get(0).reload();"
     return dict(form=form)
