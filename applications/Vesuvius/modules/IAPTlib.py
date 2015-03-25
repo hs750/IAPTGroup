@@ -16,7 +16,7 @@ def addImagesToProjects(projectSet, db):
         docImg = db(db.documents.projectID == proj.id).select(db.documents.image, db.documents.title)
         if docImg:
           proj['image'] = docImg[0].image
-          proj['imageAlt'] = 'Image of: ' + docImg[0].title
+          proj['imageAlt'] = 'Image of document: ' + docImg[0].title
         else:
           ## Illegal State!
           proj['image'] = None
