@@ -14,17 +14,18 @@
             </div>
             <div class="projImgCol">
                 {{=IMG(_src=URL('default', 'getImage', args=[project.image]), _alt=project.imageAlt)}}
-                {{=DIV(A('View', _href=URL('project', 'view', vars=dict(id=project.id)), _class='btn btn-primary'))}}
+                {{srContext = SPAN(' ' + project.title, _class='sr-only')}}
+                {{=DIV(A('View', srContext, _href=URL('project', 'view', vars=dict(id=project.id)), _class='btn btn-primary'))}}
                 {{
                     if 'dash' in locals() and dash is True:
                         action = 'Open'
                         if project.state == 'open':
                            action = 'Close'
                         pass
-                        =A(action, _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger')
+                        =A(action, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger')
 
                         if action == 'Open':
-                            =A('Review', _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-success')
+                            =A('Review', srContext, _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-success')
                         pass
                     pass
                 }}
