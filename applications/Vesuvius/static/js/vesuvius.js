@@ -73,3 +73,11 @@ function updateReqList() {
 
 /* Fix javascript modulo bug, taken from http://javascript.about.com/od/problemsolving/a/modulobug.htm 15 Mar 1015*/
 Number.prototype.mod = function(n) { return ((this%n)+n)%n; }
+
+//Auto scale text areas to fit text.
+function textAreaAutoResize(ta, maxHeight) {
+    ta.style.height = "1px";
+    var height = 25+ta.scrollHeight;
+    height = Math.min(height, maxHeight);
+    ta.style.height = height+"px";
+}

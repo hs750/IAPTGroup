@@ -66,7 +66,7 @@ def getTranscribeReviewForm(enabled, requirements, valuesInc):
         if req.type == 'Short Text':
             input = INPUT(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
         elif req.type == 'Long Text':
-            input = TEXTAREA(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
+            input = TEXTAREA(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled), _onkeyup='textAreaAutoResize(this, 300)')
         elif req.type == 'Date':
             input = INPUT(_name=intputName, _type='date', value=(req.content if valuesInc is True else ''), _readonly=(not enabled))
         elif req.type == 'Number':

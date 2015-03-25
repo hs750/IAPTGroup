@@ -340,3 +340,7 @@ input:read-only, textarea:read-only {
     padding-bottom: 10px;
     padding-left: 40px;
 }
+
+.transForm textarea {
+    height: 50px;
+}
