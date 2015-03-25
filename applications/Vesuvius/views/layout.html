@@ -64,9 +64,6 @@
   {{block head}}{{end}}
 </head>
 
-  <!-- Custom Vesuvius scripts -->
-<script src="{{=URL('static','js/vesuvius.js')}}"></script>
-
 <body>
   <!-- Navbar ================================================== -->
   <div class="navbar navbar-inverse">
@@ -154,6 +151,8 @@
 
   <!-- The javascript =============================================
        (Placed at the end of the document so the pages load faster) -->
+  <!-- Custom Vesuvius scripts -->
+  <script src="{{=URL('static','js/vesuvius.js')}}"></script>
   <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
   <script src="{{=URL('static','js/web2py_bootstrap.js')}}"></script>
   <!-- Tag-it plugin used for jquery tags in forms-->
