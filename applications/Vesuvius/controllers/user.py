@@ -19,12 +19,19 @@ def create():
                    DIV(DIV(INPUT(_type='submit',_id='user-reg-button', _value='Create',_class='btn btn-primary'),_class='controls'),_class='control-group'),_class="form-horizontal")
 
     #if form is submitted and validation passes
-    if regform.accepts(request,session):
+    if regform.accepts(request,session, keepvalues=True):
         #save user details to auth_user table. Encrypt password so that web2py's auth class can be used for login.
-        db.auth_user.insert(first_name=request.vars.first_name,last_name=request.vars.surname, email=request.vars.email_address,password=db.auth_user.password.validate(request.vars.password)[0],username=request.vars.username)
-
-        auth.login_bare(request.vars.username, request.vars.password)
-        redirect(URL('default', 'index'))
+        password = db.auth_user.password.validate(request.vars.password)
+        if password[0] == '':
+            regform.errors.password = password[1]
+        else:
+            db.auth_user.insert(first_name=request.vars.first_name,
+                                last_name=request.vars.surname,
+                                email=request.vars.email_address,
+                                password=password[0],
+                                username=request.vars.username)
+            auth.login_bare(request.vars.username, request.vars.password)
+            redirect(URL('default', 'index'))
 
     #if validation doesn't pass, highlight errors
     elif regform.errors:
