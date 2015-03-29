@@ -48,7 +48,7 @@ def searchProjects(terms, db):
     results = db(query).select(db.projects.id, db.projects.title, db.projects.description, distinct=True)
     return results
 
-def getTranscribeReviewForm(enabled, requirements, valuesInc):
+def getTranscribeReviewForm(enabled, requirements, valuesInc, transcriptionNum = ''):
     """
     A form used for transcribing and reviewing (displaying transcriptions)
     :param enabled: Whether to enable/disable input into the form
@@ -59,10 +59,10 @@ def getTranscribeReviewForm(enabled, requirements, valuesInc):
     form = FORM(_class='form-horizontal')
     rCount = 0
     for req in requirements:
-        intputName = 'req-' + str(rCount)
+        intputName = str(transcriptionNum) + 'req-' + str(rCount)
         ctrlGroup = DIV(_class='control-group')
         ctrlGroup.append(LABEL(req.name, _for=intputName, _class='control-label'))
-        input = TEXTAREA(_name=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled), _onkeyup='textAreaAutoResize(this, 300)')
+        input = TEXTAREA(_name=intputName, _id=intputName, value=(req.content if valuesInc is True else ''), _readonly=(not enabled), _onkeyup='textAreaAutoResize(this, 300)')
         ctrlGroup.append(DIV(input, _class='controls'))
         form.append(ctrlGroup)
         rCount += 1
