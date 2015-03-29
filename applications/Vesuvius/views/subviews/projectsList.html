@@ -1,6 +1,6 @@
-<div class="projectsList">
+<ul class="projectsList">
     {{for project in projects:}}
-        <div class="projectsListItem">
+        <li class="projectsListItem">
             <div class="projInfoCol">
                 <div>
                     {{=H4(project.title)}}
@@ -30,6 +30,6 @@
                     pass
                 }}
             </div>
-        </div>
+        </li>
     {{pass}}
-</div>
+</ul>

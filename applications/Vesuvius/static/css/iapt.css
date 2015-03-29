@@ -344,3 +344,7 @@ input:read-only, textarea:read-only {
 .transForm textarea {
     height: 50px;
 }
+
+.projectsList, .docList {
+    list-style-type: none;
+}
