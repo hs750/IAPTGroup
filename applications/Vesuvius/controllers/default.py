@@ -147,25 +147,29 @@ def createPartThree():
     if form.accepts(request.vars):
         # Get files
         files = request.vars['uploadFiles']
-        # If singular file and not multiple, make into list
-        if isinstance(files, basestring):
-            files = [files]
+        if files == '':
+            # Reload element if no file was added.
+            response.js = "jQuery('#partThreeForm').get(0).reload();"
+        else:        
+            # If singular file and not multiple, make into list
+            if not isinstance(files, list):
+                files = [files]
 
-        errorMessage = ''
-        # For each file uploaded:
-        for f in files:
-            # Check file type
-            if (f.filename.split(".")[-1].lower() in ['jpeg', 'png', 'jpg', 'gif', 'bmp']):
-                uploadedFile = db.tempUpload.image.store(f, f.filename)
-                i = db.tempUpload.insert(image=uploadedFile, sessionID=response.session_id)
-                db.commit()
-            else:
-                # Not a supported image.
-                errorMessage += f.filename + ', '
-        if errorMessage != '':
-            form.errors.uploadFiles = errorMessage + 'are not supported file types.'
-        # Reload component to show uploaded files and edit info
-        response.js = "jQuery('#documentsDisplay').get(0).reload();"
+            errorMessage = ''
+            # For each file uploaded:
+            for f in files:
+                # Check file type
+                if (f.filename.split(".")[-1].lower() in ['jpeg', 'png', 'jpg', 'gif', 'bmp']):
+                    uploadedFile = db.tempUpload.image.store(f, f.filename)
+                    i = db.tempUpload.insert(image=uploadedFile, sessionID=response.session_id)
+                    db.commit()
+                else:
+                    # Not a supported image.
+                    errorMessage += f.filename + ', '
+            if errorMessage != '':
+                form.errors.uploadFiles = errorMessage + 'are not supported file types.'
+            # Reload component to show uploaded files and edit info
+            response.js = "jQuery('#documentsDisplay').get(0).reload();"
     return dict(form=form)
 
 # displayDocuments allows users to give info about doc images they just uploaded.
