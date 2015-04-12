@@ -85,7 +85,7 @@
         </div><!--/.nav-collapse -->
         <form action="{{=URL('default', 'browse')}}" id='nav-search-form' class="pull-right" style="padding-top:0px;padding-bottom:0px;margin-top:5px;margin-bottom:5px;">
           <label for="search" class="sr-only">Search Projects</label>
-          <input type='text' id='search' name='search' autocomplete='off' onblur='setTimeout(function(){closeSearchFrame();}, 100)' onkeyup='getData("{{=URL('default', 'liveSearch')}}",this.value);' placeholder='Search Projects' style="margin-top:0px;margin-bottom:0px;"/>
+          <input type='text' id='search' name='search' autocomplete='off' onblur='setTimeout(function(){closeSearchFrame();}, 500)' onkeyup='getData("{{=URL('default', 'liveSearch')}}",this.value);' placeholder='Search Projects' style="margin-top:0px;margin-bottom:0px;"/>
           <div id='liveresults'></div>
         </form>
       </div>
