@@ -37,6 +37,10 @@ function closeSearchFrame() {
     hide();
 }
 
+function clearField(field) {
+    field.value = '';
+}
+
 // Add requirement field when + button clicked
 function addReq(thisval) {
     // Blank label for consistent formatting with rest of forms

@@ -100,9 +100,19 @@ def createPartTwo():
     # Create requirements form
     form = FORM(DIV(LABEL('Requirements: *', _for='basereq', _class="create-form-label"),
         INPUT(_name='basereq', _id='basereq', _class='create-form-field', requires=IS_NOT_EMPTY()),
-        INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq($("#basereq").val());'),
+        INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq($("#basereq").val());clearField(basereq);'),
         BR(), DIV(_id='wrapper', _class='create-req-wrapper')), _id='reqForm')
     
+    # Get requirements already entered
+    query = ''
+    if 'requirements' in session.tempVars:
+        curReqs = session.tempVars['requirements']
+        if isinstance(curReqs, basestring):
+            curReqs = [curReqs]
+        for req in curReqs:
+            query = query +'addReq("%s");' % req
+    response.js = query
+
     # Add form nav buttons
     nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivTwo').hide(); jQuery('.createDivOne').show(); $('#keywords').tagit();"),TAG.button('Next',_type="submit")]
     form.append(DIV(nextPrevButtons))
@@ -182,7 +192,7 @@ def displayDocuments():
     # Construct the form containing all doc items.
     form = FORM(divWrapper)
     # Add form nav buttons
-    nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()"),TAG.button('Submit',_type="submit")]
+    nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('#partTwoForm').get(0).reload();jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()"),TAG.button('Submit',_type="submit")]
     form.append(DIV(nextPrevButtons))
 
     # If form accepts, process all data
@@ -219,7 +229,13 @@ def displayDocuments():
 # Web2py doesnt seem to have any way of accessing form input variables that werent present during creation
 # So this keeps a sepearate list to refer to.
 def updateReqs():
-    session.tempVars['requirements'] = request.vars.values()[0]
+    # Get requirements from request
+    reqList = request.vars.values()[0]
+    # Ensure it is a list, and not a normal string.
+    if isinstance(reqList, basestring):
+        reqList = [reqList]
+    # Store in tempVars
+    session.tempVars['requirements'] = reqList
     return dict()
 
 def liveSearch():
