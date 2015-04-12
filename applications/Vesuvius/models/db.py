@@ -56,4 +56,4 @@ db.define_table(
 db.define_table(
     'tempUpload',
     Field('sessionID', 'text'),
-    Field('image', 'upload', requires=[IS_IMAGE(), IS_NOT_EMPTY()]))
+    Field('image', 'upload', length=128, requires=[IS_IMAGE(), IS_NOT_EMPTY()]))
