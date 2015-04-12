@@ -99,8 +99,8 @@ def createPartOne():
 def createPartTwo():
     # Create requirements form
     form = FORM(DIV(LABEL('Requirements: *', _for='basereq', _class="create-form-label"),
-        INPUT(_name='basereq', _id='basereq', _class='create-form-field', requires=IS_NOT_EMPTY()),
-        INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq($("#basereq").val());clearField(basereq);'),
+        INPUT(_name='basereq', _id='basereq', _class='create-form-field'),
+        INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq($("#basereq").val());clearField(basereq);$("#basereq").focus();'),
         BR(), DIV(_id='wrapper', _class='create-req-wrapper')), _id='reqForm')
     
     # Get requirements already entered
@@ -118,15 +118,18 @@ def createPartTwo():
     form.append(DIV(nextPrevButtons))
 
     if form.validate(keepvalues=True):
-        # Add base requirement to the others for submission.
-        reqs = [form.vars.basereq]
-        if 'requirements' in session.tempVars:
-            for r in session.tempVars['requirements']:
-                reqs.append(r)
-        session.tempVars['requirements'] = reqs
+        if form.vars.basereq or 'requirements' in session.tempVars:
+            # Add base requirement to the others for submission.
+            reqs = [form.vars.basereq]
+            if 'requirements' in session.tempVars:
+                for r in session.tempVars['requirements']:
+                    reqs.append(r)
+            session.tempVars['requirements'] = reqs
 
-        # Go to next part of form
-        response.js = "jQuery('.createDivTwo').hide(); jQuery('.createDivThree').show();"
+            # Go to next part of form
+            response.js = "jQuery('.createDivTwo').hide(); jQuery('.createDivThree').show();"
+        else:
+            form.errors.basereq ='Please enter a requirement.'
     return dict(form=form)
 
 # Part Three contains image upload, though they are displayed in a seperate component.
@@ -145,7 +148,7 @@ def createPartThree():
         # Get files
         files = request.vars['uploadFiles']
         # If singular file and not multiple, make into list
-        if not isinstance(files, list):
+        if isinstance(files, basestring):
             files = [files]
 
         errorMessage = ''
