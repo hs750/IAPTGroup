@@ -348,3 +348,7 @@ input:read-only, textarea:read-only {
 .projectsList, .docList {
     list-style-type: none;
 }
+
+.btn-project {
+    width: 70%;
+}
