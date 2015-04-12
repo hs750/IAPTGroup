@@ -2,6 +2,11 @@
         <div class="transHead">
             {{=A('Return to Project: ' + owningProject.title, _href=URL('view', vars=dict(id=owningProject.id)), _class='btn btn-default', _id='returnButton')}}
             <div class="headText">
+                {{
+                    if contributed is True:
+                        =DIV('You have transcribed this document! You can\'t transcribe again. ', A('Return to Project', _href=URL('view', vars=dict(id=owningProject.id))), _class='alert alert-success')
+                    else:
+                }}
                 <div class="alert alert-info">
                     Transcribe the document in the text areas below.
                     You can navigate through the images by using the arrow buttons below, and enlarge any image by clicking on it.
@@ -13,11 +18,7 @@
                     Your transcription is only saved once you click the 'Submit Transcription' button!
                     You may only transcribe a document once!
                 </div>
-                {{
-                    if contributed is True:
-                        =DIV('You have transcribed this document! You can\'t transcribe again. ', A('Return to Project', _href=URL('view', vars=dict(id=owningProject.id))), _class='alert alert-success')
-                    pass
-                }}
+                {{pass}}
             </div>
         </div>
         <div class="transContent">
