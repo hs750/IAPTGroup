@@ -4,7 +4,7 @@
             <div class="headText">
                 {{
                     if contributed is True:
-                        =DIV('You have transcribed this document! You can\'t transcribe again. ', A('Return to Project', _href=URL('view', vars=dict(id=owningProject.id))), _class='alert alert-success')
+                        =DIV('You have transcribed this document! You can\'t transcribe again.', _class='alert alert-success')
                     else:
                 }}
                 <div class="alert alert-info">
