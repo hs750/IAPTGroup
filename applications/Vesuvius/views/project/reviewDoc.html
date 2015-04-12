@@ -4,9 +4,9 @@
     {{=A('Return to Project: ' + owningProject.title, _href=URL('review', vars=dict(id=owningProject.id)), _class='btn btn-default', _id='returnButton')}}
     <div class="headText">
         <div class="alert alert-info">
-            To accept a transcription, click the 'Accept' button below the transcription.
-            This will reject all the other transcriptions.
-            Alternatively you can reject all the transcriptions, this will open the document to the public if you reopen the project.
+            Transcriptions to a document can be <b>accepted</b> or <b>rejected</b>.
+            Only one transcription of a document can be accepted at a time. Accepting one transcription rejects the other transcriptions.
+            If you don't like any of the transcriptions, you can reject all of them.
         </div>
         {{
             if acceptedTranscription == -1:
