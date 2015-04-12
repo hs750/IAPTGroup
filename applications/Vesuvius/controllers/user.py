@@ -84,7 +84,7 @@ def dashboard():
 
     for project in projects:
         docs = db(db.documents.projectID == project.id).count()
-        completeDocs = db((db.documents.projectID == project.id) & (db.documents.state == documentStates[1])).count()
+        completeDocs = db((db.documents.projectID == project.id) & (db.documents.state != documentStates[0])).count()
         project.totalDocs = docs
         project.compDocs = completeDocs
 
