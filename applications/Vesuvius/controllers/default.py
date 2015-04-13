@@ -141,7 +141,7 @@ def createPartThree():
         BR()), _id='uploadForm')
 
     # Upload button
-    uploadButton = TAG.button('Upload',_type="submit")
+    uploadButton = TAG.button('Upload',_type="submit", _id='submitUpload')
     form.append(uploadButton)
 
     # If files are uploaded
@@ -149,8 +149,9 @@ def createPartThree():
         # Get files
         files = request.vars['uploadFiles']
         if files == '':
-            # Reload element if no file was added.
-            response.js = "jQuery('#partThreeForm').get(0).reload();"
+            # Reset button if no files were added.
+            response.js = "jQuery('#submitUpload').addClass('btn');"
+            form.errors.uploadFiles = 'You did not select any files to upload!'
         else:        
             # If singular file and not multiple, make into list
             if not isinstance(files, list):
@@ -169,8 +170,8 @@ def createPartThree():
                     errorMessage += f.filename + ', '
             if errorMessage != '':
                 form.errors.uploadFiles = errorMessage + 'are not supported file types.'
-            # Reload component to show uploaded files and edit info
-            response.js = "jQuery('#documentsDisplay').get(0).reload();"
+            # Reload component to show uploaded files and edit info, also reset button style.
+            response.js = "jQuery('#submitUpload').addClass('btn'); jQuery('#documentsDisplay').get(0).reload();"
     return dict(form=form)
 
 # displayDocuments allows users to give info about doc images they just uploaded.
