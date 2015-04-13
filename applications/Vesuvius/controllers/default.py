@@ -121,10 +121,13 @@ def createPartTwo():
     if form.validate(keepvalues=True):
         if form.vars.basereq or 'requirements' in session.tempVars:
             # Add base requirement to the others for submission.
-            reqs = [form.vars.basereq]
+            reqs = []
+            if form.vars.basereq:
+                reqs.append(form.vars.basereq)
             if 'requirements' in session.tempVars:
                 for r in session.tempVars['requirements']:
                     reqs.append(r)
+            # Save requirements in session variable
             session.tempVars['requirements'] = reqs
 
             # Go to next part of form

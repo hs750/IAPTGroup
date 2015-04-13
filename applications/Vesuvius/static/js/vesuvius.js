@@ -43,16 +43,18 @@ function clearField(field) {
 
 // Add requirement field when + button clicked
 function addReq(thisval) {
-    // Blank label for consistent formatting with rest of forms
-    var labelstr = "<label class='create-form-label'></label>";
-    // Readonly input containing name of requirement
-    var inputstr = "<input value='%REQ%' type='text' readonly class='create-form-field'></input>".replace("%REQ%", thisval);
-    // - Button for removing requirements
-    var btnstr = "<input value='-' type='button' class='create-req-btn btn' style='width:34px;' onClick='removeReq(this.parentNode.id)'></input>";
-    // Concat divs and append to wrapper div
-    var concatDiv = "<div id=req%ID%>%LABEL%%INPUT%%BTN%</div>".replace("%ID%", thisval).replace("%LABEL%", labelstr).replace("%INPUT%", inputstr).replace("%BTN%", btnstr)
-    $('#wrapper').append(concatDiv);
-    updateReqList();
+    if(thisval != "") {
+        // Blank label for consistent formatting with rest of forms
+        var labelstr = "<label class='create-form-label'></label>";
+        // Readonly input containing name of requirement
+        var inputstr = "<input value='%REQ%' type='text' readonly class='create-form-field'></input>".replace("%REQ%", thisval);
+        // - Button for removing requirements
+        var btnstr = "<input value='-' type='button' class='create-req-btn btn' style='width:34px;' onClick='removeReq(this.parentNode.id)'></input>";
+        // Concat divs and append to wrapper div
+        var concatDiv = "<div id=req%ID%>%LABEL%%INPUT%%BTN%</div>".replace("%ID%", thisval).replace("%LABEL%", labelstr).replace("%INPUT%", inputstr).replace("%BTN%", btnstr)
+        $('#wrapper').append(concatDiv);
+        updateReqList();
+    }
 }
 
 // Remove requirement when - button clicked
