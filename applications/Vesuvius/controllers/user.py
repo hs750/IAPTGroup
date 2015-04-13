@@ -2,6 +2,7 @@
 from IAPTlib import addImagesToProjects
 
 def create():
+    response.subtitle = 'Sign Up'
     #define the registration form structure with all fields and validation
     #TODO: Customise error messages to make them more useful for the user (more specific than 'enter a value')
     regform = FORM(DIV(LABEL('Username', _for='username',_class="control-label"),
@@ -39,6 +40,7 @@ def create():
     return dict(form=regform)
 
 def login():
+    response.subtitle = 'Login'
     #define the registration form structure with all fields and validation
     #TODO: Customise error messages to make them more useful for the user (more specific than 'enter a value')
     loginform = FORM(DIV(LABEL('Username', _for='username',_class="control-label"),
@@ -66,6 +68,7 @@ def login():
 
 @auth.requires_login()
 def dashboard():
+    response.subtitle = 'My Projects'
     if request.vars.action is not None and request.vars.id is not None:
         proj = db(db.projects.id == request.vars.id).select()[0]
         if request.vars.action == 'Open':

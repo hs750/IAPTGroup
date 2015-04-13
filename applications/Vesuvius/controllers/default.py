@@ -13,7 +13,7 @@ from IAPTlib import addImagesToProjects
 from IAPTlib import searchProjects
 
 def index():
-
+    response.subtitle = 'Home'
     # The newest 5 projects
     newest = db((db.projects.id > 0) &
                 (db.projects.state == projectStates[0])).select(orderby=~db.projects.id, limitby=(0, 5))
@@ -59,6 +59,7 @@ def index():
 
 @auth.requires_login()
 def create():
+    response.subtitle = 'Create Project'
     # Clean temporary variables
     session.tempVars = {}
     db(db.tempUpload.sessionID == response.session_id).delete()
@@ -261,6 +262,11 @@ def dashboard():
     return index()
 
 def browse():
+    if (request.vars.search is not None) and (request.vars.search != ''):
+        response.subtitle = 'Search Projects: ' + request.vars.search
+    else:
+        response.subtitle = 'Browse Projects'
+
     if request.vars.search is None:
         searchTerms = ''
     else:

@@ -1,5 +1,6 @@
 from IAPTlib import getTranscribeReviewForm
 def view():
+    response.subtitle = 'View Project'
     projID = request.vars.get('id')
     project = db(db.projects.id == projID).select()[0]
     projectDocs = db(db.documents.projectID == projID).select()
@@ -8,7 +9,7 @@ def view():
 
 @auth.requires_login()
 def transcribe():
-    response.subtitle = 'Transcribe'
+    response.subtitle = 'Transcribe Document'
     docID = request.vars.get('id')
 
     # The current document and the requirements needed for it
