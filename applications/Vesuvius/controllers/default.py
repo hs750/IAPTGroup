@@ -120,7 +120,7 @@ def createPartTwo():
     form.append(DIV(nextPrevButtons, _class="create-form-btn-right"))
 
     if form.validate(keepvalues=True):
-        if form.vars.basereq or 'requirements' in session.tempVars:
+        if form.vars.basereq or (('requirements' in session.tempVars) and session.tempVars['requirements'] != []):
             # Add base requirement to the others for submission.
             reqs = []
             if form.vars.basereq:
@@ -248,7 +248,11 @@ def updateReqs():
     if isinstance(reqList, basestring):
         reqList = [reqList]
     # Store in tempVars
-    session.tempVars['requirements'] = reqList
+    if(reqList[0] != ""):
+        session.tempVars['requirements'] = reqList
+    else:
+        session.tempVars['requirements'] = []
+        print("pleshara")
     return dict()
 
 def liveSearch():
