@@ -70,17 +70,18 @@ def createPartOne():
     # Create form
     form = FORM(DIV(LABEL('Title: *', _for='title', _class="create-form-label"),
         INPUT(_name='title', _id='title', _class="create-form-field",requires=IS_NOT_EMPTY(error_message='A Project must have a Title')),
-        BR(), I('A short title for your project', _class="create-form-alttext"), _class="create-form-item"),
+         I('A short title for your project', _class="create-form-alttext"), _class="create-form-item"),
     DIV(LABEL('Description:', _for='description', _class="create-form-label"),
         TEXTAREA(_name='description', _id='description', _rows = 3, _style ='width:300px;', _class="create-form-field"),
-        BR(), I('You can make the description as detailed as you like. It\'s purpose is to give people an introduction to the project.', _class="create-form-alttext"), _class="create-form-item"),
+         I('You can make the description as detailed as you like. It\'s purpose is to give people an introduction to the project.', _class="create-form-alttext"), _class="create-form-item"),
     DIV(LABEL('Keywords:', _for='keywords', _class="create-form-label"),
         INPUT(_name='keywords', _id='keywords', _class="create-form-field"),
-        BR(), I('Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas or spaces.', _class="create-form-alttext"), _class="create-form-item"))
+         I('Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas or spaces.', _class="create-form-alttext"),_class="create-form-item"),
+        DIV('* indicates required field.', _class="create-form-alttext"),BR(), _class="create-form")
 
 
     nextButton = [TAG.button('Next',_type="submit")]
-    form.append(DIV(nextButton))
+    form.append(DIV(nextButton, _class="create-form-btn-right"))
 
     # Turn keywords input into a tagit field.
     response.js = "$('#keywords').tagit();"
@@ -100,9 +101,9 @@ def createPartOne():
 def createPartTwo():
     # Create requirements form
     form = FORM(DIV(LABEL('Requirements: *', _for='basereq', _class="create-form-label"),
-        INPUT(_name='basereq', _id='basereq', _class='create-form-field'),
+        INPUT(_name='basereq', _id='basereq', _class='create-req-field'),
         INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq($("#basereq").val());clearField(basereq);$("#basereq").focus();'),
-        BR(), DIV(_id='wrapper', _class='create-req-wrapper')), _id='reqForm')
+        BR(), DIV(_id='wrapper', _class='create-req-wrapper')), BR(), _class="create-form", _id='reqForm')
     
     # Get requirements already entered
     query = ''
@@ -116,7 +117,7 @@ def createPartTwo():
 
     # Add form nav buttons
     nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('.createDivTwo').hide(); jQuery('.createDivOne').show(); $('#keywords').tagit();"),TAG.button('Next',_type="submit")]
-    form.append(DIV(nextPrevButtons))
+    form.append(DIV(nextPrevButtons, _class="create-form-btn-right"))
 
     if form.validate(keepvalues=True):
         if form.vars.basereq or 'requirements' in session.tempVars:

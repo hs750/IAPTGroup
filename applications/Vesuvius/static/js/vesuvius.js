@@ -47,7 +47,7 @@ function addReq(thisval) {
         // Blank label for consistent formatting with rest of forms
         var labelstr = "<label class='create-form-label'></label>";
         // Readonly input containing name of requirement
-        var inputstr = "<input value='%REQ%' type='text' readonly class='create-form-field'></input>".replace("%REQ%", thisval);
+        var inputstr = "<input value='%REQ%' type='text' readonly class='create-req-field'></input>".replace("%REQ%", thisval);
         // - Button for removing requirements
         var btnstr = "<input value='-' type='button' class='create-req-btn btn' style='width:34px;' onClick='removeReq(this.parentNode.id)'></input>";
         // Concat divs and append to wrapper div
@@ -70,7 +70,7 @@ function removeReq(id) {
 function updateReqList() {
     var reqs = [];
     // Get each relevant input field, and add its value to the list
-    $('#wrapper').find('input.create-form-field').each(function(index,elem){reqs.push($(elem).val());})
+    $('#wrapper').find('input.create-req-field').each(function(index,elem){reqs.push($(elem).val());})
     if(reqs != "") {
         // Post the value to the function updateReqs() located in default.py
         $.post("/Vesuvius/default/updateReqs",{partialstr:reqs});
