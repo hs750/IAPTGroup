@@ -69,7 +69,7 @@ def create():
 def createPartOne():
     # Create form
     form = FORM(DIV(LABEL('Title: *', _for='title', _class="create-form-label"),
-        INPUT(_name='title', _id='title', _class="create-form-field",requires=IS_NOT_EMPTY()),
+        INPUT(_name='title', _id='title', _class="create-form-field",requires=IS_NOT_EMPTY(error_message='A Project must have a Title')),
         BR(), I('A short title for your project', _class="create-form-alttext"), _class="create-form-item"),
     DIV(LABEL('Description:', _for='description', _class="create-form-label"),
         TEXTAREA(_name='description', _id='description', _rows = 3, _style ='width:300px;', _class="create-form-field"),
@@ -192,10 +192,10 @@ def displayDocuments():
         # Unique ids are also required so we use the index of the loop.
         docImg = IMG(_src=URL('default', 'getImage', args=[doc.image]), _id='docimg%s' % index, _class='create-form-doc-img')
         docTitle = DIV(LABEL('Title:', _for='doctitle%s' % index, _class="create-form-label"),
-            INPUT(_name='title%s' % index, _value=filename,_id='doctitle%s' % index, _class="create-form-field", requires=IS_NOT_EMPTY()),
+            INPUT(_name='title%s' % index, _value=filename,_id='doctitle%s' % index, _class="create-form-field", requires=IS_NOT_EMPTY(error_message='Enter a Title for the Document')),
             _class='create-form-doc-title')
         docDesc = DIV(LABEL('Description:', _for='docdesc%s' % index, _class="create-form-label"),
-            TEXTAREA(_name='desc%s' % index, _id='docdesc%s' % index, _rows = 3, _style ='width:300px;', _class="create-form-field", requires=IS_NOT_EMPTY()),
+            TEXTAREA(_name='desc%s' % index, _id='docdesc%s' % index, _rows = 3, _style ='width:300px;', _class="create-form-field", requires=IS_NOT_EMPTY(error_message='Enter a Description of the Document')),
             _class='create-form-doc-desc')
         docItem = DIV(docImg, docTitle, docDesc, _id='docitem%s' % index,_class='create-form-doc-item')
         # Append item to the wrapper div
