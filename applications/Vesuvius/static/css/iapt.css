@@ -300,6 +300,17 @@ input:read-only, textarea:read-only {
     width:440px;
 }
 
+.createDivOne {
+    width: 500px;
+}
+
+.createDivTwo {
+    width: 500px;
+}
+
+.createDivThree {
+    width: 660px;
+}
 .create-form-label {
     float: left;
     padding-right: 30px;
@@ -362,8 +373,10 @@ input:read-only, textarea:read-only {
 }
 
 .create-form-doc-wrapper {
-    height: 500px;
+    min-height: 100px;
+    max-height: 500px;
     width: 660px;
+    overflow: auto;
 }
 
 .create-form-doc-item {

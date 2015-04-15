@@ -212,7 +212,7 @@ def displayDocuments():
         divWrapper.append(docItem)
 
     # Construct the form containing all doc items.
-    form = FORM(divWrapper, _class="create-upl-form")
+    form = FORM(divWrapper, BR(), _class="create-upl-form")
     # Add form nav buttons
     nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('#partTwoForm').get(0).reload();jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()"),TAG.button('Submit',_type="submit")]
     form.append(DIV(nextPrevButtons, _class="create-form-btn-right"))
