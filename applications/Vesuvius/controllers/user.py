@@ -87,4 +87,9 @@ def dashboard():
         project.totalDocs = docs
         project.compDocs = completeDocs
 
+        transcriptionCount = db((db.documents.projectID == project.id) &
+                                (db.documents.id == db.contributions.documentID)).count()
+
+        project.transcriptionCount = transcriptionCount
+
     return dict(projects=projects, transcriptions=transcriptions)

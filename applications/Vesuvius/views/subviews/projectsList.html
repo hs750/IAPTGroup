@@ -23,7 +23,10 @@
                            action = 'Close'
                         pass
                         actionText = action + ' project'
-                        =A(actionText, srContext, ' to be transcribed', _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger btn-project')
+
+                        if action == 'Open' or project.transcriptionCount > 0:
+                            =A(actionText, srContext, ' to be transcribed', _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger btn-project')
+                        pass
 
                         if action == 'Open':
                             =A('Review transcriptions to project', srContext, _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-success btn-project')
