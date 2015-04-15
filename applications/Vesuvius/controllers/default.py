@@ -214,7 +214,11 @@ def displayDocuments():
     # Construct the form containing all doc items.
     form = FORM(divWrapper, BR(), _class="create-upl-form")
     # Add form nav buttons
-    nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('#partTwoForm').get(0).reload();jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()"),TAG.button('Submit',_type="submit")]
+    nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('#partTwoForm').get(0).reload();jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()")]
+    if documents:
+        nextPrevButtons += [TAG.button('Submit',_type="submit")]
+    else:
+        nextPrevButtons += [SPAN('Must upload at least one image before you can finish creating the project!', _class='alert alert-error')]
     form.append(DIV(nextPrevButtons, _class="create-form-btn-right"))
 
     # If form accepts, process all data
