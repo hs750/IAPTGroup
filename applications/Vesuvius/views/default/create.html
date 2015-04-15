@@ -7,7 +7,7 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" type="text/javascript"></script>
 <div class="createDivOne">
     <h3>Project Information</h3>
-    <p>To create a new project, please fill in the required fields below:</p>
+    <p class="alert alert-info">To create a new project, please fill in the required fields below:</p>
     <br>
     <div id="partOneForm">
         {{=LOAD('default', 'createPartOne.load', ajax=True, user_signature=True, target='partOneForm')}}
@@ -16,7 +16,9 @@
 
 <div class="createDivTwo hidden">
     <h3>Requirements</h3>
-    <p>What do you require of people transcribing your documents? For example this can be 'date' or 'author' or 'full transcription'</p>
+    <p class="alert alert-info">
+        What do you want people to transcribe from your documents? You can specify specific information (eg, 'Author', 'Publication Date', 'Title') or just ask people to transcribe the whole document in one (eg, 'All Text Content').
+    </p>
     <div id="partTwoForm">
         {{=LOAD('default', 'createPartTwo.load', ajax=True, user_signature=True, target='partTwoForm')}}
     </div>
@@ -24,8 +26,10 @@
 
 <div class="createDivThree hidden">
     <h3>Document Images</h3>
-    <p>Upload the documents you want transcribed here. (You can add more later if you like)</p>
-    <p>Supported Image Formats: jpeg, png, jpg, gif, bmp</p>
+    <div class="alert alert-info">
+        <p>Upload the documents you want transcribed here. You don't have to add them all in one go.</p>
+        <p>Supported Image Formats: jpeg, png, jpg, gif, bmp</p>
+    </div>
     <div id="partThreeForm">
         {{=LOAD('default', 'createPartThree.load', ajax=True, user_signature=True, target='partThreeForm')}}
     </div>
