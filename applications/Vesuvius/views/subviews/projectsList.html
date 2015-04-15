@@ -3,7 +3,7 @@
         <li class="projectsListItem">
             <div class="projInfoCol">
                 <div>
-                    {{=H4(project.title)}}
+                    {{=H4(project.title, _id=project.title)}}
                     {{if 'dash' in locals() and dash is True:}}
                         <div class="alert alert-info dashNotification">
                             Project is {{=B(project.state)}}. {{=project.compDocs}}/{{=project.totalDocs}} documents completed.
@@ -18,13 +18,22 @@
                 {{=DIV(A('View project', srContext, _href=URL('project', 'view', vars=dict(id=project.id)), _class='btn btn-primary btn-project'))}}
                 {{
                     if 'dash' in locals() and dash is True:
-                        action = 'Open project'
+                        action = 'Open'
                         if project.state == 'open':
-                           action = 'Close project'
+                           action = 'Close'
                         pass
-                        =A(action, srContext, ' to be transcribed', _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger btn-project')
+                        actionText = action + ' project'
 
-                        if action == 'Open project':
+                        if action == 'Open' or project.transcriptionCount > 0:
+                            actionBtn = A(actionText, srContext, ' to be transcribed', _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger btn-project')
+                            if action == 'Close':
+                                =actionBtn
+                            elif project.unCompleteDocCount > 0:
+                                =actionBtn
+                            pass
+                        pass
+
+                        if action == 'Open':
                             =A('Review transcriptions to project', srContext, _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-success btn-project')
                         pass
                     pass

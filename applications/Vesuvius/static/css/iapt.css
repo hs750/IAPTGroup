@@ -5,12 +5,12 @@
 
 .homeProjLeft {
     float: left;
-    width: 50%;
+    width: 49%;
 }
 
 .homeProjRight {
     float: right;
-    width: 50%;
+    width: 49%;
 }
 .projectsListItem{
     width: 50%;

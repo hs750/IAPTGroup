@@ -219,36 +219,26 @@ def displayDocuments():
 
     # If form accepts, process all data
     if form.accepts(request.vars):
-        if documents:
-            # Create project
-            newProj = db.projects.insert(title=session.tempVars['title'], description=session.tempVars['desc'], state='open',userID=auth.user)
+        # Create project
+        newProj = db.projects.insert(title=session.tempVars['title'], description=session.tempVars['desc'], state='closed',userID=auth.user)
 
-            # Add project keywords
-            keywords = session.tempVars['keywords'].split(',')
-            for k in keywords:
-                if db(db.keywords.keyword == k).isempty():
-                    key = db.keywords.insert(keyword=k)
-                else:
-                    key = db(db.keywords.keyword == k).select().first()
-                db.projectKeywords.insert(keywordID=key.id, projectID=newProj.id)
+        # Add project keywords
+        keywords = session.tempVars['keywords'].split(',')
+        for k in keywords:
+            if db(db.keywords.keyword == k).isempty():
+                key = db.keywords.insert(keyword=k)
+            else:
+                key = db(db.keywords.keyword == k).select().first()
+            db.projectKeywords.insert(keywordID=key.id, projectID=newProj.id)
 
             # Add requirements
             requirements = session.tempVars['requirements']
             for r in requirements:
                 db.requirements.insert(name=r, projectID=newProj.id)
 
-            # Add documents
-            for index, doc in enumerate(documents):
-                # Fetch values from form
-                docTitle = request.vars['title%s' % index]
-                docDesc = request.vars['desc%s' % index]
-                db.documents.insert(title=docTitle,description=docDesc,image=doc.image,state='open',projectID=newProj.id)
 
-            # Creation is done, return to home page?
-            redirect(URL('default', 'index', extension='html'), client_side=True)
-        else:
-            print(form.errors)
-            #form.errors.createdocwrapper = "Please upload at least one document."
+        # Creation is done, open dashboard
+        redirect(URL('user', 'dashboard', extension='html#'+session.tempVars['title']), client_side=True)
 
     return dict(form=form)
 

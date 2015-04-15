@@ -1,12 +1,20 @@
 {{extend 'layout.html'}}
-
+<div class="hero-unit">
+    <p>Welcome to <b>Vesuvius</b>, the historic crowd-sourced document transcription site!</p>
+    <p>
+        There are several things you can do whilst on <b>Vesuvius</b>. If you are interested in historic documents
+        you can view documents uploaded to the site and can contribute to historic discovery and digitisation by
+        transcribing the documents you are viewing. If you have documents you want digitised, you can create a project
+        and upload your images to allow other uses to transcribe it!
+    </p>
+</div>
 <div class="homeProjLeft homeList">
-    <h2>Most Recent</h2>
+    <legend><h2>Most Recent</h2></legend>
     {{projects = new}}
     {{include 'subviews/projectsList.html'}}
 </div>
 <div class="homeProjRight homeList">
-    <h2>Most Popular</h2>
+    <legend><h2>Most Popular</h2></legend>
     {{projects = topFive}}
     {{include 'subviews/projectsList.html'}}
 </div>
