@@ -27,7 +27,9 @@
         {{=H2(doc.title)}}
         {{=DIV(doc.description)}}
         <div>
-            {{=DIV(IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description), _class='transImg')}}
+            {{imgURL = URL('default', 'getImage', args=[doc.image])}}
+            <!-- No need for alt text as doc.description is displayed above anyway-->
+            {{=DIV(A(IMG(_src=imgURL, _class='transImg'), _href=imgURL, _class='image-popup'))}}
             {{
                 if not contributed:
                     =DIV(form, _class='transForm')
@@ -40,3 +42,14 @@
             {{=A(SPAN('Previous', SPAN(' Document', _class='sr-only'), _class='arrow-label'), _href=URL(vars=dict(id=prevDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docPrevArrow')}}
             {{=A(SPAN('Next', SPAN(' Document', _class='sr-only'), _class='arrow-label'), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-success btn-lg docNavArrow', _id='docNextArrow')}}
         </div>
+
+        <link href="/Vesuvius/static/css/magnific-popup.css" rel="stylesheet" type="text/css">
+        <script src="{{=URL('static','js/jquery.magnific-popup.js')}}"></script>
+        <script>
+            $(document).ready(function() {
+                $('.image-popup').magnificPopup({
+                    type: 'image',
+                    closeOnContentClick: true
+                });
+            });
+        </script>
