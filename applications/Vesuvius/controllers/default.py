@@ -161,7 +161,7 @@ def createPartThree():
             if not isinstance(files, list):
                 files = [files]
 
-            errorMessage = ''
+            errorFiles = []
             # For each file uploaded:
             for f in files:
                 # Check file type
@@ -171,9 +171,15 @@ def createPartThree():
                     db.commit()
                 else:
                     # Not a supported image.
-                    errorMessage += f.filename + ', '
-            if errorMessage != '':
-                form.errors.uploadFiles = errorMessage + 'are not supported file types.'
+                    errorFiles += [f.filename]
+            if len(errorFiles) > 0:
+                errorMessage = ''
+                if len(errorFiles) == 1:
+                    errorMessage = errorFiles[0] + ' is not a supported image type.'
+                else:
+                    errorMessage = str(errorFiles) + ' are not supported image types.'
+                errorMessage += ' Please select jpeg, png, jpg, gif or bmp image files.'
+                form.errors.uploadFiles = errorMessage
             # Reload component to show uploaded files and edit info, also reset button style.
             response.js = "jQuery('#submitUpload').addClass('btn'); jQuery('#documentsDisplay').get(0).reload();"
     return dict(form=form)
