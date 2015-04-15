@@ -81,6 +81,14 @@ function updateReqList() {
     }
 }
 
+function errorMove(containerNode) {
+    $(containerNode).find('.error_wrapper').each(function(index,elem){$(elem).remove();$(elem).appendTo($(containerNode));})
+}
+
+function errorClear(containerNode) {
+    $(containerNode).find('.error_wrapper').each(function(index,elem){$(elem).remove();})
+}
+
 /* Fix javascript modulo bug, taken from http://javascript.about.com/od/problemsolving/a/modulobug.htm 15 Mar 1015*/
 Number.prototype.mod = function(n) { return ((this%n)+n)%n; }
 

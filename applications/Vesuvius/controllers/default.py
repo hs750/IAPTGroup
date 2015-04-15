@@ -77,7 +77,7 @@ def createPartOne():
     DIV(LABEL('Keywords:', _for='keywords', _class="create-form-label"),
         INPUT(_name='keywords', _id='keywords', _class="create-form-field"),
          I('Descriptive keywords will make it easier for people to find your project when searching. Separate keywords by using commas or spaces.', _class="create-form-alttext"),_class="create-form-item"),
-        DIV('* indicates required field.', _class="create-form-alttext"),BR(), _class="create-form")
+        DIV('* indicates required field.', _class="create-form-alttext"),BR(), _class="create-req-form")
 
 
     nextButton = [TAG.button('Next',_type="submit")]
@@ -102,8 +102,8 @@ def createPartTwo():
     # Create requirements form
     form = FORM(DIV(LABEL('Requirements: *', _for='basereq', _class="create-form-label"),
         INPUT(_name='basereq', _id='basereq', _class='create-req-field'),
-        INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq($("#basereq").val());clearField(basereq);$("#basereq").focus();'),
-        BR(), DIV(_id='wrapper', _class='create-req-wrapper')), BR(), _class="create-form", _id='reqForm')
+        INPUT(_value='+', _type='button', _class='create-req-btn', _onClick='addReq($("#basereq").val());errorClear($("#basereq").parent());clearField(basereq);$("#basereq").focus();'),
+        BR(), DIV(_id='wrapper', _class='create-req-wrapper'), _class="create-req-item"), BR(), _class="create-req-form", _id='reqForm')
     
     # Get requirements already entered
     query = ''
@@ -134,19 +134,22 @@ def createPartTwo():
             # Go to next part of form
             response.js = "jQuery('.createDivTwo').hide(); jQuery('.createDivThree').show();"
         else:
+            response.js = "errorMove($('#basereq').parent());"
             form.errors.basereq ='Please enter a requirement.'
+
     return dict(form=form)
 
 # Part Three contains image upload, though they are displayed in a seperate component.
 def createPartThree():
     # Create upload form
     form = FORM(DIV(LABEL('Add Files: *', _for='upload', _class="create-form-label"),
-        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='',_class='upload create-form-field'),
-        BR()), _id='uploadForm')
+        INPUT(_name='uploadFiles', _id='uploadField', _type='file', _multiple='', _class='upload create-form-field'),
+        DIV(TAG.button('Upload',_type="submit", _id='submitUpload'), _style='display:inline-block;'),
+        BR()), _class="create-upl-form", _id='uploadForm')
 
     # Upload button
-    uploadButton = TAG.button('Upload',_type="submit", _id='submitUpload')
-    form.append(uploadButton)
+    #uploadButton = TAG.button('Upload',_type="submit", _id='submitUpload')
+    #form.append(uploadButton)
 
     # If files are uploaded
     if form.accepts(request.vars):
@@ -154,7 +157,7 @@ def createPartThree():
         files = request.vars['uploadFiles']
         if files == '':
             # Reset button if no files were added.
-            response.js = "jQuery('#submitUpload').addClass('btn');"
+            response.js = "jQuery('#submitUpload').addClass('btn');errorMove($('#uploadField').parent());"
             form.errors.uploadFiles = 'You did not select any files to upload!'
         else:        
             # If singular file and not multiple, make into list
@@ -190,7 +193,7 @@ def displayDocuments():
     # Get documents that have been uploaded
     documents = db(db.tempUpload.sessionID == response.session_id).select()
 
-    divWrapper = DIV(_class='create-form-doc-wrapper')
+    divWrapper = DIV(_class='create-form-doc-wrapper', _id='createdocwrapper')
     # Construct divs for each document
     for index, doc in enumerate(documents):
         # Get image and filename
@@ -209,39 +212,43 @@ def displayDocuments():
         divWrapper.append(docItem)
 
     # Construct the form containing all doc items.
-    form = FORM(divWrapper)
+    form = FORM(divWrapper, _class="create-upl-form")
     # Add form nav buttons
     nextPrevButtons = [TAG.button('Back', _type="button",_onClick = "jQuery('#partTwoForm').get(0).reload();jQuery('.createDivThree').hide(); jQuery('.createDivTwo').show()"),TAG.button('Submit',_type="submit")]
-    form.append(DIV(nextPrevButtons))
+    form.append(DIV(nextPrevButtons, _class="create-form-btn-right"))
 
     # If form accepts, process all data
     if form.accepts(request.vars):
-        # Create project
-        newProj = db.projects.insert(title=session.tempVars['title'], description=session.tempVars['desc'], state='open',userID=auth.user)
+        if documents:
+            # Create project
+            newProj = db.projects.insert(title=session.tempVars['title'], description=session.tempVars['desc'], state='open',userID=auth.user)
 
-        # Add project keywords
-        keywords = session.tempVars['keywords'].split(',')
-        for k in keywords:
-            if db(db.keywords.keyword == k).isempty():
-                key = db.keywords.insert(keyword=k)
-            else:
-                key = db(db.keywords.keyword == k).select().first()
-            db.projectKeywords.insert(keywordID=key.id, projectID=newProj.id)
+            # Add project keywords
+            keywords = session.tempVars['keywords'].split(',')
+            for k in keywords:
+                if db(db.keywords.keyword == k).isempty():
+                    key = db.keywords.insert(keyword=k)
+                else:
+                    key = db(db.keywords.keyword == k).select().first()
+                db.projectKeywords.insert(keywordID=key.id, projectID=newProj.id)
 
-        # Add requirements
-        requirements = session.tempVars['requirements']
-        for r in requirements:
-            db.requirements.insert(name=r, projectID=newProj.id)
+            # Add requirements
+            requirements = session.tempVars['requirements']
+            for r in requirements:
+                db.requirements.insert(name=r, projectID=newProj.id)
 
-        # Add documents
-        for index, doc in enumerate(documents):
-            # Fetch values from form
-            docTitle = request.vars['title%s' % index]
-            docDesc = request.vars['desc%s' % index]
-            db.documents.insert(title=docTitle,description=docDesc,image=doc.image,state='open',projectID=newProj.id)
+            # Add documents
+            for index, doc in enumerate(documents):
+                # Fetch values from form
+                docTitle = request.vars['title%s' % index]
+                docDesc = request.vars['desc%s' % index]
+                db.documents.insert(title=docTitle,description=docDesc,image=doc.image,state='open',projectID=newProj.id)
 
-        # Creation is done, return to home page?
-        redirect(URL('default', 'index', extension='html'), client_side=True)
+            # Creation is done, return to home page?
+            redirect(URL('default', 'index', extension='html'), client_side=True)
+        else:
+            print(form.errors)
+            #form.errors.createdocwrapper = "Please upload at least one document."
 
     return dict(form=form)
 
