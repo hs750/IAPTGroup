@@ -18,13 +18,14 @@
                 {{=DIV(A('View project', srContext, _href=URL('project', 'view', vars=dict(id=project.id)), _class='btn btn-primary btn-project'))}}
                 {{
                     if 'dash' in locals() and dash is True:
-                        action = 'Open project'
+                        action = 'Open'
                         if project.state == 'open':
-                           action = 'Close project'
+                           action = 'Close'
                         pass
-                        =A(action, srContext, ' to be transcribed', _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger btn-project')
+                        actionText = action + ' project'
+                        =A(actionText, srContext, ' to be transcribed', _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger btn-project')
 
-                        if action == 'Open project':
+                        if action == 'Open':
                             =A('Review transcriptions to project', srContext, _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-success btn-project')
                         pass
                     pass
