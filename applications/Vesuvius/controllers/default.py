@@ -258,7 +258,6 @@ def updateReqs():
         session.tempVars['requirements'] = reqList
     else:
         session.tempVars['requirements'] = []
-        print("pleshara")
     return dict()
 
 def liveSearch():

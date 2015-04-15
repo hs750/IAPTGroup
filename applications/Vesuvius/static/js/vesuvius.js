@@ -60,7 +60,7 @@ function addReq(thisval) {
 // Remove requirement when - button clicked
 function removeReq(id) {
     // Add # symbol to start of id and remove
-    var rId = "#%ID%".replace("%ID%", id)
+    var rId = "#" + id.replace(/([ #;?&,.+*~\':"!%^$[\]()=>|\/@])/g,'\\$1');
     $(rId).remove()
     updateReqList();
 }
