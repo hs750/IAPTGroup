@@ -217,7 +217,7 @@ def displayDocuments():
     # If form accepts, process all data
     if form.accepts(request.vars):
         # Create project
-        newProj = db.projects.insert(title=session.tempVars['title'], description=session.tempVars['desc'], state='open',userID=auth.user)
+        newProj = db.projects.insert(title=session.tempVars['title'], description=session.tempVars['desc'], state='closed',userID=auth.user)
 
         # Add project keywords
         keywords = session.tempVars['keywords'].split(',')
@@ -240,8 +240,8 @@ def displayDocuments():
             docDesc = request.vars['desc%s' % index]
             db.documents.insert(title=docTitle,description=docDesc,image=doc.image,state='open',projectID=newProj.id)
 
-        # Creation is done, return to home page?
-        redirect(URL('default', 'index', extension='html'), client_side=True)
+        # Creation is done, open dashboard
+        redirect(URL('user', 'dashboard', extension='html#'+session.tempVars['title']), client_side=True)
 
     return dict(form=form)
 

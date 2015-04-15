@@ -3,7 +3,7 @@
         <li class="projectsListItem">
             <div class="projInfoCol">
                 <div>
-                    {{=H4(project.title)}}
+                    {{=H4(project.title, _id=project.title)}}
                     {{if 'dash' in locals() and dash is True:}}
                         <div class="alert alert-info dashNotification">
                             Project is {{=B(project.state)}}. {{=project.compDocs}}/{{=project.totalDocs}} documents completed.
