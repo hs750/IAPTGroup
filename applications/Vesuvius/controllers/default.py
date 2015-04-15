@@ -231,11 +231,17 @@ def displayDocuments():
                 key = db(db.keywords.keyword == k).select().first()
             db.projectKeywords.insert(keywordID=key.id, projectID=newProj.id)
 
-            # Add requirements
-            requirements = session.tempVars['requirements']
-            for r in requirements:
-                db.requirements.insert(name=r, projectID=newProj.id)
+        # Add requirements
+        requirements = session.tempVars['requirements']
+        for r in requirements:
+            db.requirements.insert(name=r, projectID=newProj.id)
 
+        # Add documents
+        for index, doc in enumerate(documents):
+            # Fetch values from form
+            docTitle = request.vars['title%s' % index]
+            docDesc = request.vars['desc%s' % index]
+            db.documents.insert(title=docTitle,description=docDesc,image=doc.image,state='open',projectID=newProj.id)
 
         # Creation is done, open dashboard
         redirect(URL('user', 'dashboard', extension='html#'+session.tempVars['title']), client_side=True)
