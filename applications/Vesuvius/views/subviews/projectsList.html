@@ -25,7 +25,12 @@
                         actionText = action + ' project'
 
                         if action == 'Open' or project.transcriptionCount > 0:
-                            =A(actionText, srContext, ' to be transcribed', _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger btn-project')
+                            actionBtn = A(actionText, srContext, ' to be transcribed', _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-danger btn-project')
+                            if action == 'Close':
+                                =actionBtn
+                            elif project.unCompleteDocCount > 0:
+                                =actionBtn
+                            pass
                         pass
 
                         if action == 'Open':
