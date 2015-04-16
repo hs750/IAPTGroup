@@ -276,7 +276,7 @@ def liveSearch():
         nameDiv = H4(project.title, _class="liveSearchResultTileTitle", _id="res%s"%i)
         imgDiv = DIV(IMG(_src=URL('default', 'getImage', args=[project.image]), _alt=project.imageAlt), _class="liveSearchResultTileImg")
         descDiv = DIV(project.description, _class="liveSearchResultTileDesc")
-        items.append(A(nameDiv, imgDiv, descDiv, _href="#", _onclick="copyIntoSearch($('#res%s').html())"%i, _class="liveSearchResult"))
+        items.append(A(nameDiv, imgDiv, descDiv, _href=URL('project','view', vars=dict(id=project.id)), _class="liveSearchResult"))
     return TAG[''](*items)
 
 def dashboard():
