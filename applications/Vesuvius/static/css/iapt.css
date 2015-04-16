@@ -32,9 +32,10 @@
 
 .projInfoCol{
     float: right;
-    width: 74%;
+    width: 72%;
     height: 100%;
     padding-left: 2%;
+    margin-right: 2%;
 }
 
 .projInfoCol h4 {

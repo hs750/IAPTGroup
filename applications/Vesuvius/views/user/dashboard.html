@@ -9,12 +9,12 @@
     TODO - Some info text about the dashboard
 </div>
 <div class="dashProjList">
-    {{=H2('My Projects')}}
+    {{=LEGEND(H2('My Projects'))}}
     {{dash = True}}
     {{include 'subviews/projectsList.html'}}
 </div>
 <div class="dashTranscriptions">
-{{=H2('My Transcriptions')}}
+{{=LEGEND(H2('My Transcriptions'))}}
 {{
         transTable = TABLE(THEAD(TR(TH('Content'), TH('State'), TH('Project'), TH('Document'))), _class='table table-striped')
         transTableContent = TBODY()
