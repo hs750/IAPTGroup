@@ -47,10 +47,10 @@
             if count > 1:
                 = A(SPAN('Previous Transcription', _class='arrow-label'), _href=URL(vars=dict(id=document.id, display=((display-2) % (count-1))+1)), _class='btn btn-primary docNavArrow docNavArrow-small', _id='prevT')
                 = A(SPAN('Next Transcription', _class='arrow-label'), _href=URL(vars=dict(id=document.id, display=(display % (count-1))+1)), _class='btn btn-primary docNavArrow docNavArrow-small', _id='nextT')
+                =LEGEND()
             else:
-                = DIV('There are no transcriptions!', _class='alert alert-error transForm reviewForm')
+                = DIV('There are no transcriptions for this document!', _class='alert alert-error')
             pass
-            =LEGEND()
         }}
         </div>
     </div>
