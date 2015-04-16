@@ -294,7 +294,7 @@ input:-moz-read-only, textarea:-moz-read-only {
 }
 
 .docNavArrow-small .arrow-label {
-    top: 0px;
+    top: 3px;
 }
 
 .create-req-form {
