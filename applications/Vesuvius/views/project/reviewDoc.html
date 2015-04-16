@@ -24,7 +24,7 @@
     </div>
 </div>
 <div class="transContent">
-    {{=H2(document.title)}}
+    {{=LEGEND(H2(document.title))}}
     {{=DIV(document.description)}}
     <div>
         {{imgURL = URL('default', 'getImage', args=[document.image])}}
@@ -33,11 +33,14 @@
         {{
             count = 1
             display = int(request.vars.get('display', 1))
+        }}
+        <div class="transForm reviewForm">
+        {{
             for trans in userTranscriptions:
                 (form, c) = getTranscribeReviewForm(False, trans.transcriptions, True, count)
                 acceptBtn = DIV(A('Accept', SPAN(' Transcription ' + str(count), _class='sr-only'), _href=URL(vars=dict(id=document.id, accepted=count)), _class='btn btn-success'), _class='acceptBtn')
 
-                =DIV(H3('Transcription ' + str(count), XML('<small>of '+ str(len(userTranscriptions)) + '</small>')), form, acceptBtn, _class='transForm reviewForm', _hidden=(count != display), _id='trans'+str(count))
+                =DIV(LEGEND(H3('Transcription ' + str(count), XML('<small>of '+ str(len(userTranscriptions)) + '</small>'))), form, acceptBtn, _hidden=(count != display), _id='trans'+str(count))
                 count += 1
 
             pass
@@ -47,7 +50,9 @@
             else:
                 = DIV('There are no transcriptions!', _class='alert alert-error transForm reviewForm')
             pass
+            =LEGEND()
         }}
+        </div>
     </div>
 </div>
 <div class="transFoot">

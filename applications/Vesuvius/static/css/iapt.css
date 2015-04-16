@@ -234,8 +234,14 @@
 }
 
 input:read-only, textarea:read-only {
-    background-color: whitesmoke;
-    cursor: text;
+    background-color: #ffffff;
+    cursor: default;
+}
+
+/* Repeated as otherwise it doesnt work in firefox*/
+input:-moz-read-only, textarea:-moz-read-only {
+    background-color: #ffffff;
+    cursor: default;
 }
 
 .docNavArrow-small {
@@ -252,11 +258,14 @@ input:read-only, textarea:read-only {
 }
 
 #prevT {
-    left: 37%;
+    position: relative;
+    bottom: 30px;
 }
 
 #nextT {
-    right: 11%;
+    position: relative;
+    float: right;
+    bottom: 30px;
 }
 
 .docNavArrow-small .arrow-label {
@@ -268,11 +277,11 @@ input:read-only, textarea:read-only {
 }
 
 .reviewImg {
-    width: 30%;
+    width: 32%;
 }
 
 .reviewForm {
-    width: 63%;
+    width: 65%;
 }
 
 .docNavArrow:hover, .docNavArrow:focus{
