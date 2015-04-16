@@ -1,5 +1,13 @@
 {{extend 'layout.html'}}
-
+{{if request.vars.created is not None:}}
+        <div class="alert alert-success">
+            TODO - Some stuff about completing a project
+            {{=A('Open and View your new project.', _href='#'+request.vars.created)}}
+        </div>
+{{pass}}
+<div class="alert alert-info">
+    TODO - Some info text about the dashboard
+</div>
 <div class="dashProjList">
     {{=H2('My Projects')}}
     {{dash = True}}

@@ -248,7 +248,7 @@ def displayDocuments():
             db.documents.insert(title=docTitle,description=docDesc,image=doc.image,state='open',projectID=newProj.id)
 
         # Creation is done, open dashboard
-        redirect(URL('user', 'dashboard', extension='html#'+session.tempVars['title']), client_side=True)
+        redirect(URL('user', 'dashboard', extension='html', vars=dict(created=session.tempVars['title'])), client_side=True)
 
     return dict(form=form)
 
