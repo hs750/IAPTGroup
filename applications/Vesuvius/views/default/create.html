@@ -16,9 +16,10 @@
 
 <div class="createDivTwo hidden">
     <h3>Requirements</h3>
-    <p class="alert alert-info">
-        What do you want people to transcribe from your documents? You can specify specific information (eg, 'Author', 'Publication Date', 'Title') or just ask people to transcribe the whole document in one (eg, 'All Text Content').
-    </p>
+    <div class="alert alert-info">
+        <p>What do you want people to transcribe from your documents? You can specify specific information (eg, 'Author', 'Publication Date', 'Title') or just ask people to transcribe the whole document in one (eg, 'All Text Content').</p>
+        <p>To add a requirement, type your requirement into the area below. If you have multiple requirements click the '+' button after entering the first, then enter another, and so on...</p>
+    </div>
     <div id="partTwoForm">
         {{=LOAD('default', 'createPartTwo.load', ajax=True, user_signature=True, target='partTwoForm')}}
     </div>
