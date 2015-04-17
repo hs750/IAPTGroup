@@ -446,3 +446,7 @@ div.error {
 .image-popup:hover {
     cursor: zoom-in;
 }
+
+.btn-dash {
+    margin-top: 1px;
+ }

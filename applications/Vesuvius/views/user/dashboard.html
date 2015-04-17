@@ -1,12 +1,15 @@
 {{extend 'layout.html'}}
 {{if request.vars.created is not None:}}
         <div class="alert alert-success">
-            Congratulations, your project is complete! Now you need to wait for users to transcribe your project. Once your project has some transcriptions you can review and accept the best ones.
-            {{=A('Open and View your new project.', _href='#'+request.vars.created)}}
+            <p>Congratulations, you have successfully created a new project! Now you need to wait for users to transcribe your project. Once your project has some transcriptions you can review and accept the best ones.</p>
+            <p>Once a document has been transcribed three times, it becomes 'done', no one else will be able to transcribe it after that.
+                Once all the documents are done, the project will automatically close and you will be able to review the transcriptions</p>
+            <p>Don't forget to {{=A('open your new project.', _href='#'+request.vars.created)}}</p>
         </div>
 {{pass}}
 <div class="alert alert-info">
-    Welcome to your dashboard, here you can do all things project related. You can review transcriptions, open and close your project, and visit your project pages. You are also able to view the transcriptions you have made on other projects.
+    <p>Welcome to your dashboard, here you can do all things project related. You can review transcriptions to your projects, open and close your projects and visit your project pages. You are also able to view the transcriptions you have made on other projects.</p>
+    <p>Opening a project makes it visible to other users and allows them to start transcribing it. Closing a project hides it from other users.</p>
 </div>
 <div class="dashProjList">
     {{=LEGEND(H2('My Projects'))}}
