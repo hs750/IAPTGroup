@@ -23,7 +23,10 @@ def create():
         #save user details to auth_user table. Encrypt password so that web2py's auth class can be used for login.
         password = db.auth_user.password.validate(request.vars.password)
         if password[0] == '':
-            regform.errors.password = password[1]
+            if password[1] == 'Too short':
+                regform.errors.password = 'That password was too short. It must be 4 or more characters.'
+            else:
+                regform.errors.password = password[1]
         else:
             db.auth_user.insert(first_name=request.vars.first_name,
                                 last_name=request.vars.surname,
