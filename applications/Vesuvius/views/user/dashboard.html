@@ -1,12 +1,12 @@
 {{extend 'layout.html'}}
 {{if request.vars.created is not None:}}
         <div class="alert alert-success">
-            TODO - Some stuff about completing a project
+            Congratulations, your project is complete! Now you need to wait for users to transcribe your project. Once your project has some transcriptions you can review and accept the best ones.
             {{=A('Open and View your new project.', _href='#'+request.vars.created)}}
         </div>
 {{pass}}
 <div class="alert alert-info">
-    TODO - Some info text about the dashboard
+    Welcome to your dashboard, here you can do all things project related. You can review transcriptions, open and close your project, and visit your project pages. You are also able to view the transcriptions you have made on other projects.
 </div>
 <div class="dashProjList">
     {{=LEGEND(H2('My Projects'))}}
