@@ -14,7 +14,13 @@
             <div class="projImgCol">
                 {{=IMG(_src=URL('default', 'getImage', args=[project.image]), _alt=project.imageAlt)}}
                 {{srContext = SPAN(' ' + project.title, _class='sr-only')}}
-                {{=DIV(A('View', srContext, _href=URL('project', 'view', vars=dict(id=project.id)), _class='btn btn-project'))}}
+                {{viewClass = 'btn btn-project'}}
+                {{
+                    if 'dash' not in locals():
+                        viewClass += ' btn-primary'
+                        pass
+                }}
+                {{=DIV(A('View', srContext, _href=URL('project', 'view', vars=dict(id=project.id)), _class=viewClass))}}
                 {{
                     if 'dash' in locals() and dash is True:
                         action = 'Open'
@@ -24,7 +30,11 @@
                         actionText = action
 
                         if action == 'Open' or project.transcriptionCount > 0:
-                            actionBtn = A(actionText, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class='btn btn-project')
+                            actionBtnClass = 'btn btn-project'
+                            if request.vars.created is not None and project.title == request.vars.created:
+                                actionBtnClass += ' btn-success'
+                            pass
+                            actionBtn = A(actionText, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class=actionBtnClass)
                             if action == 'Close':
                                 =actionBtn
                             elif project.unCompleteDocCount > 0:
