@@ -435,6 +435,7 @@ textarea:-moz-read-only {
 
 .btn-project {
     width: 70%;
+    margin-top: 1px;
 }
 
 /* Remove gradient from error messages to increase contrast (and make it look nicer)*/
@@ -446,7 +447,3 @@ div.error {
 .image-popup:hover {
     cursor: zoom-in;
 }
-
-.btn-dash {
-    margin-top: 1px;
- }
