@@ -418,3 +418,7 @@ div.error {
     background-image: none;
     background-repeat: no-repeat;
 }
+
+.image-popup:hover {
+    cursor: zoom-in;
+}
