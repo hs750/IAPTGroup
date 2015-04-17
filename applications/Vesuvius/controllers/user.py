@@ -31,7 +31,7 @@ def create():
                                 password=password[0],
                                 username=request.vars.username)
             auth.login_bare(request.vars.username, request.vars.password)
-            redirect(URL('default', 'index'))
+            redirect(session._auth_next)
 
     #if validation doesn't pass, highlight errors
     elif regform.errors:
@@ -53,7 +53,7 @@ def login():
         if not auth.login_bare(request.vars.username, request.vars.password):
             response.flash = 'Login attempt failed. Please try again'
         else:
-            redirect(session.returnURL)
+            redirect(session._auth_next)
     #if validation doesn't pass, highlight errors
     elif loginform.errors:
         response.flash = 'Login attempt failed. See below for more details.'
