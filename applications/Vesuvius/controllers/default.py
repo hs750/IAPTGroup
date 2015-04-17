@@ -218,7 +218,7 @@ def displayDocuments():
     if documents:
         nextPrevButtons += [TAG.button('Submit',_type="submit")]
     else:
-        nextPrevButtons += [SPAN('Must upload at least one image before you can finish creating the project!', _class='alert alert-error')]
+        nextPrevButtons += [TAG.button('Submit',_type="submit", _disabled="true")]
     form.append(DIV(nextPrevButtons, _class="create-form-btn-right"))
 
     # If form accepts, process all data
