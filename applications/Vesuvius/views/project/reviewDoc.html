@@ -4,19 +4,26 @@
     {{=A('Return to Project: ' + owningProject.title, _href=URL('review', vars=dict(id=owningProject.id)), _class='btn btn-default', _id='returnButton')}}
     <div class="headText">
         <div class="alert alert-info">
-            Transcriptions to a document can be <b>accepted</b> or <b>rejected</b>.
-            Only one transcription of a document can be accepted at a time. Accepting one transcription rejects the other transcriptions.
-            If you don't like any of the transcriptions, you can reject all of them.
+            <p>
+                Transcriptions to a document can be <b>accepted</b> or <b>rejected</b>.
+                Only one transcription of a document can be accepted at a time. Accepting one transcription rejects the other transcriptions.
+                If you don't like any of the transcriptions, you can reject all of them.
+            </p>
+            <p>
+                You can cycle through the transcriptions by using the next and previous transcription buttons below the
+                transcription. Once you are done with one document, you can move to the next by using the next or previous
+                document buttons at either side of the page.
+            </p>
         </div>
         {{
             if acceptedTranscription == -1:
-                acceptText = 'No transcriptions have been accepted'
+                acceptText = 'You have not accepted or rejected any transcriptions yet for this document.'
                 acceptClass = 'info'
             elif acceptedTranscription == 0:
-                acceptText = 'All transcriptions have been rejected!'
+                acceptText = 'You rejected all transcriptions to this document!'
                 acceptClass = 'warning'
             elif acceptedTranscription > 0:
-                acceptText = 'Transcription ' + str(acceptedTranscription) + ' has been accepted!'
+                acceptText = 'You accepted transcription ' + str(acceptedTranscription) + ' for this document!'
                 acceptClass = 'success'
             pass
             =DIV(acceptText, _class='alert alert-'+acceptClass)
