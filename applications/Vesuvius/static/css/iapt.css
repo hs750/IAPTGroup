@@ -237,12 +237,36 @@
 input:read-only, textarea:read-only {
     background-color: #ffffff;
     cursor: default;
+    border: none;
+    box-shadow: none;
+    border-radius: 0px;
+    outline: none;
+    border-style: none;
+
+    border-left: solid;
+    border-left-width: 1px;
+    border-left-color: lightgray;
+    border-right: solid;
+    border-right-width: 1px;
+    border-right-color: lightgray;
 }
 
 /* Repeated as otherwise it doesnt work in firefox*/
 input:-moz-read-only, textarea:-moz-read-only {
     background-color: #ffffff;
     cursor: default;
+    border: none;
+    box-shadow: none;
+    border-radius: 0px;
+    outline: none;
+    border-style: none;
+
+    border-left: solid;
+    border-left-width: 1px;
+    border-left-color: lightgray;
+    border-right: solid;
+    border-right-width: 1px;
+    border-right-color: lightgray;
 }
 
 .docNavArrow-small {
