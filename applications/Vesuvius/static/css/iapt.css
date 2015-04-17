@@ -234,7 +234,7 @@
     border: 0;
 }
 
-input:read-only, textarea:read-only {
+textarea:read-only {
     background-color: #ffffff;
     cursor: default;
     border: none;
@@ -252,7 +252,7 @@ input:read-only, textarea:read-only {
 }
 
 /* Repeated as otherwise it doesnt work in firefox*/
-input:-moz-read-only, textarea:-moz-read-only {
+textarea:-moz-read-only {
     background-color: #ffffff;
     cursor: default;
     border: none;
