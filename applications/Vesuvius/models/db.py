@@ -4,6 +4,7 @@ db = DAL('sqlite://IAPT_DB.db')
 
 auth = Auth(db)
 auth.define_tables(username=True, signature=False)
+auth.settings.actions_disabled=['request_reset_password', 'retrieve_username']
 
 # System State Constants
 projectStates = ['open', 'closed']
