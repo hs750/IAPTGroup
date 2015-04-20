@@ -4,7 +4,7 @@
             <div class="projInfoCol">
                 {{=H4(project.title, _id=project.title)}}
                 {{if 'dash' in locals() and dash is True:}}
-                    <div class="alert alert-info dashNotification">
+                    <div class="alert alert-info dashNotification" style="margin-bottom: 7px">
                         Project is {{=B(project.state)}}. {{=project.compDocs}}/{{=project.totalDocs}} documents completed.
                     </div>
                 {{pass}}
