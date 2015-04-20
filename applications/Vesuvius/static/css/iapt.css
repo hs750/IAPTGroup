@@ -12,38 +12,36 @@
     float: right;
     width: 49%;
 }
-.projectsListItem{
-    width: 50%;
-    height: auto;
-    float: left;
-    padding-bottom: 10px;
+
+.projectsList {
     overflow: auto;
 }
+
+.projectsListItem{
+    display: block;
+    float: left;
+    width: 500px;
+    padding-right: 20px;
+    padding-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
 .projImgCol{
-    width: 24%;
-    max-width: 200px;
     float:left;
+    width: 120px;
     text-align: center;
  }
 
 .projImgCol img {
-    width: 100%;
+    width: 120px;
+    height: 180px;
 }
 
 .projInfoCol{
-    float: right;
-    width: 72%;
-    height: 100%;
-    padding-left: 2%;
-    margin-right: 2%;
-}
-
-.projInfoCol h4 {
-    margin-top: 1px;
-}
-
-.homeList > .projectsList > .projectsListItem {
-    width: 100%;
+    display: inline-block;
+    padding-left: 20px;
+    width: 360px;
 }
 
 .projDocDiv {
