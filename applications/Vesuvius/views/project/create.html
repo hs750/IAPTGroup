@@ -10,7 +10,7 @@
     <p class="alert alert-info">To create a new project, please fill in the required fields below:</p>
     <br>
     <div id="partOneForm">
-        {{=LOAD('default', 'createPartOne.load', ajax=True, user_signature=True, target='partOneForm')}}
+        {{=LOAD('project', 'createPartOne.load', ajax=True, user_signature=True, target='partOneForm')}}
     </div>
 </div>
 
@@ -21,7 +21,7 @@
         <p>To add a requirement, type your requirement into the area below. If you have multiple requirements click the '+' button after entering the first, then enter another, and so on...</p>
     </div>
     <div id="partTwoForm">
-        {{=LOAD('default', 'createPartTwo.load', ajax=True, user_signature=True, target='partTwoForm')}}
+        {{=LOAD('project', 'createPartTwo.load', ajax=True, user_signature=True, target='partTwoForm')}}
     </div>
 </div>
 
@@ -32,9 +32,9 @@
         <p>Supported Image Formats: jpeg, png, jpg, gif, bmp</p>
     </div>
     <div id="partThreeForm">
-        {{=LOAD('default', 'createPartThree.load', ajax=True, user_signature=True, target='partThreeForm')}}
+        {{=LOAD('project', 'createPartThree.load', ajax=True, user_signature=True, target='partThreeForm')}}
     </div>
     <div id="documentsDisplay">
-        {{=LOAD('default', 'displayDocuments.load', ajax=True, user_signature=True, target='documentsDisplay')}}
+        {{=LOAD('project', 'displayDocuments.load', ajax=True, user_signature=True, target='documentsDisplay')}}
     </div>
 </div>
