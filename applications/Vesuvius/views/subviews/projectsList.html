@@ -27,10 +27,11 @@
                         if project.state == 'open':
                            action = 'Close'
                         pass
+
                         actionText = action
+                        actionBtnClass = 'btn btn-project'
 
                         if action == 'Open' or project.transcriptionCount > 0:
-                            actionBtnClass = 'btn btn-project'
                             if request.vars.created is not None and project.title == request.vars.created:
                                 actionBtnClass += ' btn-success'
                             pass
