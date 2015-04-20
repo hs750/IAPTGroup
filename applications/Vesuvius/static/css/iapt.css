@@ -370,6 +370,11 @@ textarea:-moz-read-only {
     position:relative;
 }
 
+.create-form-doc-item * .error_wrapper {
+    left: 150px;
+    position:relative;
+}
+
 .create-req-item .error_wrapper {
     width: 120px;
     left: 150px;
