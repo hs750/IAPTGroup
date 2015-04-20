@@ -8,7 +8,6 @@
                         Project is {{=B(project.state)}}. {{=project.compDocs}}/{{=project.totalDocs}} documents completed.
                     </div>
                 {{pass}}
-                <legend></legend>
                 {{=DIV(project.description)}}
             </div>
             <div class="projImgCol">
@@ -27,10 +26,11 @@
                         if project.state == 'open':
                            action = 'Close'
                         pass
+
                         actionText = action
+                        actionBtnClass = 'btn btn-project'
 
                         if action == 'Open' or project.transcriptionCount > 0:
-                            actionBtnClass = 'btn btn-project'
                             if request.vars.created is not None and project.title == request.vars.created:
                                 actionBtnClass += ' btn-success'
                             pass
@@ -40,10 +40,15 @@
                             elif project.unCompleteDocCount > 0:
                                 =actionBtn
                             pass
+                        else:
+                            =A(actionText, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class=actionBtnClass, _disabled=True, _title='You cannot close the project until someone has made a transcription.')
                         pass
+
 
                         if action == 'Open':
                             =A('Review', srContext, _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-project')
+                        else:
+                            =A('Review', srContext, _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-project', _disabled=True, _title='You cannot review a project until you close it.')
                         pass
                     pass
                 }}
