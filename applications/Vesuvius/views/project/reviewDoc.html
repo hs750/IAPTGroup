@@ -47,7 +47,7 @@
                 (form, c) = getTranscribeReviewForm(False, trans.transcriptions, True, count)
                 acceptBtn = DIV(A('Accept', SPAN(' Transcription ' + str(count), _class='sr-only'), _href=URL(vars=dict(id=document.id, accepted=count)), _class='btn btn-success'), _class='acceptBtn')
 
-                =DIV(LEGEND(H3('Transcription ' + str(count), XML('<small>of '+ str(len(userTranscriptions)) + '</small>'))), form, acceptBtn, _hidden=(count != display), _id='trans'+str(count))
+                =DIV(LEGEND(H3('Transcription ' + str(count), XML('<small> of '+ str(len(userTranscriptions)) + '</small>'))), form, acceptBtn, _hidden=(count != display), _id='trans'+str(count))
                 count += 1
 
             pass

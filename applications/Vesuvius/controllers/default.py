@@ -88,6 +88,10 @@ def browse():
 
     return dict(projects=results)
 
+def help():
+    response.subtitle = 'Help Page'
+    return index()
+
 def user():
     """
     exposes:
