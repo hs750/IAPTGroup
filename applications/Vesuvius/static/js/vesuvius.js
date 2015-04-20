@@ -74,12 +74,12 @@ function updateReqList() {
     // Get each relevant input field, and add its value to the list
     $('#wrapper').find('input.create-req-field').each(function(index,elem){reqs.push($(elem).val());})
     if(reqs.length > 0) {
-        // Post the value to the function updateReqs() located in default.py
-        $.post("/Vesuvius/default/updateReqs",{partialstr:reqs});
+        // Post the value to the function updateReqs() located in project.py
+        $.post("/Vesuvius/project/updateReqs",{partialstr:reqs});
     } else {
         // If there are no requirements to post, post a list with an empty element.
         // This solves a bug with an empty post not being picked up by the web2py function
-        $.post("/Vesuvius/default/updateReqs",{partialstr:['']});
+        $.post("/Vesuvius/project/updateReqs",{partialstr:['']});
     }
 }
 
