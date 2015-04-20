@@ -44,6 +44,10 @@
     width: 360px;
 }
 
+.projInfoCol h4 {
+    margin-top: 0px;
+}
+
 .projDocDiv {
     text-align: center;
     width: 15%;

@@ -33,10 +33,12 @@ function copyIntoSearch(value) {
     $("#nav-search-form").submit();
 }
 
+// Called by live search to hide when focus changes.
 function closeSearchFrame() {
     hide();
 }
 
+// Simple function used to clear an input field.
 function clearField(field) {
     field.value = '';
 }
@@ -81,10 +83,12 @@ function updateReqList() {
     }
 }
 
+// Function that moves an error wrapper node to the bottom of a container. Used in create form.
 function errorMove(containerNode) {
     $(containerNode).find('.error_wrapper').each(function(index,elem){$(elem).remove();$(elem).appendTo($(containerNode));})
 }
 
+// Function deletes an error. Used in create form.
 function errorClear(containerNode) {
     $(containerNode).find('.error_wrapper').each(function(index,elem){$(elem).remove();})
 }

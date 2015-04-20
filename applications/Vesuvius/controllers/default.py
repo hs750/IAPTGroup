@@ -188,7 +188,7 @@ def createPartThree():
     return dict(form=form)
 
 # displayDocuments allows users to give info about doc images they just uploaded.
-# Its submit button creates the project.
+# The Submit button creates the project.
 def displayDocuments():
     # Get documents that have been uploaded
     documents = db(db.tempUpload.sessionID == response.session_id).select()
