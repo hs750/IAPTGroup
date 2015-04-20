@@ -1,16 +1,18 @@
 <ul class="docList">
     {{for doc in docs:}}
         <li class="projDocDiv">
-            {{=H3(doc.title)}}
-            {{=IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description)}}
+            {{=H4(doc.title)}}
             {{
                 if 'review' in locals() and review is True:
+                    =A(IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description), _href=URL('project', 'reviewDoc', vars=dict(id=doc.id)))
                     =DIV('This document is ', B(doc.state), _class='alert alert-info')
                     =DIV(A('Review', _href=URL('project', 'reviewDoc', vars=dict(id=doc.id)), _class='btn btn-primary'))
                 else:
                     if doc.state == documentStates[1]:
+                        =IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description)
                         =DIV('This document is Done!', _class='alert alert-info')
                     else:
+                        =A(IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description), _href=URL('project', 'transcribe', vars=dict(id=doc.id)))
                         =DIV(A('Transcribe', _href=URL('project', 'transcribe', vars=dict(id=doc.id)), _class='btn btn-primary'))
                     pass
                 pass

@@ -50,9 +50,22 @@
 
 .projDocDiv {
     text-align: center;
-    width: 15%;
     float:left;
-    margin-left: 2%
+    width: 200px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    height: 280px;
+}
+
+.projDocDiv img {
+    width: 120px;
+    height: 180px;
+    margin-bottom: 1px;
+}
+
+.projDocDiv h4 {
+    word-wrap: break-word;
+
 }
 
 .transImg {
@@ -418,6 +431,7 @@ textarea:-moz-read-only {
     max-height: 500px;
     width: 660px;
     overflow: auto;
+    overflow-x: hidden;
 }
 
 .create-form-doc-item {
@@ -425,7 +439,7 @@ textarea:-moz-read-only {
     margin-top: 20px;
     margin-bottom: 20px;
     position: relative;
-    height: 180px;
+    min-height: 180px;
     border: solid 1px;
     padding-top: 10px;
     padding-bottom: 10px;
