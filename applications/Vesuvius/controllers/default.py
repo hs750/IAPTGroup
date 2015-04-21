@@ -13,6 +13,10 @@ from IAPTlib import addImagesToProjects
 from IAPTlib import searchProjects
 
 def index():
+    """
+    The home page of the application
+    :return: newest and most popular projects
+    """
     response.subtitle = 'Home'
     # The newest 5 projects
     newest = db((db.projects.id > 0) &
@@ -58,6 +62,10 @@ def index():
     return dict(new=newest, topFive=topFive)
 
 def liveSearch():
+    """
+    Search for projects by title, description and keywords. Used for the search bar displayed on every page.
+    :return: List of projects matching the search.
+    """
     searchStr = request.vars.values()[0]
     projects = searchProjects(searchStr, db)
     addImagesToProjects(projects, db)
@@ -69,10 +77,11 @@ def liveSearch():
         items.append(A(nameDiv, imgDiv, descDiv, _href=URL('project','view', vars=dict(id=project.id)), _class="liveSearchResult"))
     return TAG[''](*items)
 
-def dashboard():
-    return index()
-
 def browse():
+    """
+    Browse and Search projects
+    :return: projects matching search
+    """
     if (request.vars.search is not None) and (request.vars.search != ''):
         response.subtitle = 'Search Projects: ' + request.vars.search
     else:
@@ -89,8 +98,12 @@ def browse():
     return dict(projects=results)
 
 def help():
-    response.subtitle = 'Help Page'
-    return index()
+    """
+    Help page for how to use the application
+    :return: Nothing
+    """
+    response.subtitle = 'Help'
+    return dict()
 
 def user():
     """
