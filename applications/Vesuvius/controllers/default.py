@@ -28,6 +28,7 @@ def index():
     projectDocs = dict()
     projectCompletedDocs = dict()
 
+    # Calculate the popularity of each project based on the number of completed documents
     for doc in allDocs:
         projID = doc.projectID
         docsForProj = projectDocs.get(projID, 0)
