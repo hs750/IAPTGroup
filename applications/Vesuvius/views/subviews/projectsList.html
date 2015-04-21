@@ -1,15 +1,22 @@
+<!-- A List of projects -->
+
 <ul class="projectsList">
     {{for project in projects:}}
         <li class="projectsListItem">
             <div class="projInfoCol">
                 {{=H4(project.title, _id=project.title)}}
+
+                <!-- If on dashboard display state information -->
                 {{if 'dash' in locals() and dash is True:}}
                     <div class="alert alert-info dashNotification" style="margin-bottom: 7px">
                         Project is {{=B(project.state)}}. {{=project.compDocs}}/{{=project.totalDocs}} documents completed.
                     </div>
                 {{pass}}
+
                 {{=DIV(project.description)}}
             </div>
+
+            <!-- Left column containing the image and buttons -->
             <div class="projImgCol">
                 {{=IMG(_src=URL('default', 'getImage', args=[project.image]), _alt=project.imageAlt)}}
                 {{srContext = SPAN(' ' + project.title, _class='sr-only')}}
@@ -21,6 +28,7 @@
                 }}
                 {{=DIV(A('View', srContext, _href=URL('project', 'view', vars=dict(id=project.id)), _class=viewClass))}}
                 {{
+                    # If on the dashboard display open/close and review buttons
                     if 'dash' in locals() and dash is True:
                         action = 'Open'
                         if project.state == 'open':
@@ -32,20 +40,24 @@
 
                         if action == 'Open' or project.transcriptionCount > 0:
                             if request.vars.created is not None and project.title == request.vars.created:
+                                # Highlight open button if the project is newly created.
                                 actionBtnClass += ' btn-success'
                             pass
                             if project.totalDocs == project.compDocs:
+                                # Cant open a project if it has no open documents.
                                 =SPAN(actionText, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class=actionBtnClass, _disabled=True, _title='You cannot open the project as all documents are done.')
                             else:
                                 =A(actionText, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class=actionBtnClass)
                             pass
                         else:
+                            # Cannot close a project unless it has a transcription
                             =SPAN(actionText, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class=actionBtnClass, _disabled=True, _title='You cannot close the project until someone has made a transcription.')
                         pass
 
                         if action == 'Open':
                             =A('Review', srContext, _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-project')
                         else:
+                            # Can only review a project if it is closed.
                             =SPAN('Review', srContext, _href=URL('project', 'review', vars=dict(id=project.id)), _class='btn btn-project', _disabled=True, _title='You cannot review a project until you close it.')
                         pass
                     pass
