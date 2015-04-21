@@ -7,19 +7,19 @@
                         =DIV('You have transcribed this document! You can\'t transcribe again.', _class='alert alert-success')
                     else:
                 }}
-                <div class="alert alert-info">
-                    Transcribe the document in the text areas below.
-                    You can navigate through the images by using the arrow buttons below, and enlarge any image by clicking on it.
-                    When you're finished transcribing, please press the submit button.
-                </div>
-                <div class="alert alert-warning">
-                    You do not have to fill all transcription boxes! And do not have to transcribe all document.
-                    <br>
-                    Your transcription is only saved once you click the 'Submit Transcription' button!
-                    <b>Changing document will lose your transcription if you haven't submitted it.</b>
-                    <br>
-                    You may only transcribe a document once!
-                </div>
+                    <div class="alert alert-info">
+                        Transcribe the document in the text areas below.
+                        You can navigate through the images by using the arrow buttons below, and enlarge any image by clicking on it.
+                        When you're finished transcribing, please press the submit button.
+                    </div>
+                    <div class="alert alert-warning">
+                        You do not have to fill all transcription boxes! And do not have to transcribe all document.
+                        <br>
+                        Your transcription is only saved once you click the 'Submit Transcription' button!
+                        <b>Changing document will lose your transcription if you haven't submitted it.</b>
+                        <br>
+                        You may only transcribe a document once!
+                    </div>
                 {{pass}}
             </div>
         </div>
@@ -32,6 +32,7 @@
             {{=DIV(A(IMG(_src=imgURL, _class='transImg'), _href=imgURL, _class='image-popup'))}}
             {{
                 if not contributed:
+                    # Only show the transcription form if the user has not already transcribed the document
                     =DIV(form, _class='transForm')
                 pass
             }}
@@ -40,12 +41,14 @@
         <div class="transFoot">
             {{=DIV('Document ' + str(currentDoc) + ' of ' + str(totalDocs))}}
             {{if totalDocs > 1:
+                # Only display next and previous buttons if there are other documents
                 =A(SPAN('Previous Document', _class='arrow-label'), _href=URL(vars=dict(id=prevDocID)), _class='btn btn-primary btn-lg docNavArrow', _id='docPrevArrow')
                 =A(SPAN('Next Document', _class='arrow-label'), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-primary btn-lg docNavArrow', _id='docNextArrow')
                 pass
             }}
         </div>
 
+        <!-- Allow zooming of the document image in a popup view -->
         <link href="{{=URL('static','css/magnific-popup.css')}}" rel="stylesheet" type="text/css">
         <script src="{{=URL('static','js/jquery.magnific-popup.js')}}"></script>
         <script>
