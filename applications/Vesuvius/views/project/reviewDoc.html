@@ -38,11 +38,16 @@
         <!-- No need for alt text as doc.description is displayed above anyway-->
         {{=DIV(A(IMG(_src=imgURL, _class='transImg reviewImg'), _href=imgURL, _class='image-popup'))}}
         {{
+            # The number of transcriptions on the page.
             count = 1
+            # The transcription that is currently being displayed, default 1
             display = int(request.vars.get('display', 1))
         }}
         <div class="transForm reviewForm">
         {{
+            # Construct the transcription displays. Consists of:
+            #   The filled transcription forms
+            #   An accept button for each transcription
             for trans in userTranscriptions:
                 (form, c) = getTranscribeReviewForm(False, trans.transcriptions, True, count)
                 acceptBtn = DIV(A('Accept', SPAN(' Transcription ' + str(count), _class='sr-only'), _href=URL(vars=dict(id=document.id, accepted=count)), _class='btn btn-success'), _class='acceptBtn')
@@ -52,6 +57,7 @@
 
             pass
             if count > 1:
+                # Only display next and previous buttons if there are other transcriptions
                 = A(SPAN('Previous Transcription', _class='arrow-label'), _href=URL(vars=dict(id=document.id, display=((display-2) % (count-1))+1)), _class='btn btn-primary docNavArrow docNavArrow-small', _id='prevT')
                 = A(SPAN('Next Transcription', _class='arrow-label'), _href=URL(vars=dict(id=document.id, display=(display % (count-1))+1)), _class='btn btn-primary docNavArrow docNavArrow-small', _id='nextT')
                 =LEGEND()
@@ -66,14 +72,18 @@
     {{=A(SPAN('Reject All Transcriptions'), _href=URL(vars=dict(id=document.id, accepted='reject')), _class='btn btn-danger btn-lg')}}
     {{=DIV('Document ' + str(currentDoc) + ' of ' + str(totalDocs))}}
     {{if totalDocs > 1:
+        # Only display next and previous buttons if there are other documents
         =A(SPAN('Previous Document', _class='arrow-label'), _href=URL(vars=dict(id=prevDocID)), _class='btn btn-primary btn-lg docNavArrow', _id='docPrevArrow')
         =A(SPAN('Next Document', _class='arrow-label'), _href=URL(vars=dict(id=nextDocID)), _class='btn btn-primary btn-lg docNavArrow', _id='docNextArrow')
         pass
     }}
 </div>
 <script>
+    // When javascript is enabled, no need to refresh the page to move between viewing each transcription.
+    // only show one of the transcriptions at a time.
     var currentIndex = {{=display}};
     var total = {{=count}};
+    // View the previous transcription
     $( "#prevT" ).click(function(e) {
         e.preventDefault();
         currentIndex = ((currentIndex-2).mod(total-1))+1;
@@ -85,6 +95,8 @@
             }
         }
     });
+
+    //View the next transcription
     $( "#nextT" ).click(function(e) {
         e.preventDefault();
         currentIndex = (currentIndex.mod(total-1))+1;
@@ -99,6 +111,7 @@
 
 </script>
 
+<!-- Allow zooming of the document image in a popup view -->
 <link href="{{=URL('static','css/magnific-popup.css')}}" rel="stylesheet" type="text/css">
 <script src="{{=URL('static','js/jquery.magnific-popup.js')}}"></script>
 <script>
