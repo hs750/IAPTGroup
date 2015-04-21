@@ -69,6 +69,9 @@ def login():
 def dashboard():
     response.subtitle = 'My Projects'
     if request.vars.action is not None and request.vars.id is not None:
+        # perform actions specified in the url vars
+        # action = 'open' or 'close' a project
+        # id = a project id
         proj = db(db.projects.id == request.vars.id).select()[0]
         if request.vars.action == 'Open':
             proj.state = projectStates[0]
@@ -84,6 +87,9 @@ def dashboard():
                         (db.documents.projectID == db.projects.id)
                         ).select(db.contributions.content, db.contributions.state, db.projects.title, db.documents.title)
 
+    # For each project calculate attributes about it: number of documents,
+    # number of completed documents, number of overall transcriptions to the project,
+    # the number of uncompleted documents
     for project in projects:
         docs = db(db.documents.projectID == project.id).count()
         completeDocs = db((db.documents.projectID == project.id) & (db.documents.state != documentStates[0])).count()
