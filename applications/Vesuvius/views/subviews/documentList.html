@@ -1,13 +1,17 @@
+<!-- A list of the documents contained within the project-->
+
 <ul class="docList">
     {{for doc in docs:}}
         <li class="projDocDiv">
             {{=H4(doc.title)}}
             {{
                 if 'review' in locals() and review is True:
+                    # if reviewing, link to review page rather than transcribe page
                     =A(IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description), _href=URL('project', 'reviewDoc', vars=dict(id=doc.id)))
                     =DIV('This document is ', B(doc.state), _class='alert alert-info')
                     =DIV(A('Review', _href=URL('project', 'reviewDoc', vars=dict(id=doc.id)), _class='btn btn-primary'))
                 else:
+                    # Only link to transcribe page if the document is not 'done'
                     if doc.state == documentStates[1]:
                         =IMG(_src=URL('default', 'getImage', args=[doc.image]), _alt=doc.description)
                         =DIV('This document is Done!', _class='alert alert-info')
