@@ -60,6 +60,8 @@ def transcribe():
             proj.update_record()
 
         response.flash = 'Transcription successfully saved.'
+
+    # Has anyone contributed to this document
     contributed = not db((db.contributions.documentID == document.id) &
                          (db.contributions.userID == auth.user.id)).isempty()
     owningProject = db(db.projects.id == document.projectID).select(db.projects.id, db.projects.title)[0]
@@ -84,6 +86,7 @@ def reviewDoc():
     document = db(db.documents.id == docID).select()[0]
     owningProject = db(db.projects.id == document.projectID).select(db.projects.id, db.projects.title)[0]
 
+    # Collate the transcriptions made my each user to the document
     usersTranscribed = db(db.contributions.documentID == docID).select(db.contributions.userID, distinct=True)
     for user in usersTranscribed:
         user.transcriptions = db((db.contributions.documentID == docID) &
@@ -126,7 +129,7 @@ def reviewDoc():
     transcriptionStates = db(db.contributions.documentID == docID).select(db.contributions.userID,
                                                                           db.contributions.state, distinct=True)
 
-    print transcriptionStates
+    # Work out which transcription has been accepted (if any (non = -1))
     acceptedTrans = -1
     anyRejected = False
     for tState in transcriptionStates:
@@ -134,7 +137,7 @@ def reviewDoc():
             acceptedTrans = tState.userID
         elif tState.state == contributionStates[2]:
             anyRejected = True
-    print acceptedTrans
+
     # -1 indicates nothing has been accepted or rejected, 0 indicates all rejected
     acceptedIndex = 0 if anyRejected else -1
     count = 1
