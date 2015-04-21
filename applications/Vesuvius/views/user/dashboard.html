@@ -1,5 +1,6 @@
 {{extend 'layout.html'}}
 {{if request.vars.created is not None:}}
+        <!-- Popup for when a new project has just been created -->
         <div class="alert alert-success">
             <p>Congratulations, you have successfully created a new project! Now you need to wait for users to transcribe your project. Once your project has some transcriptions you can review and accept the best ones.</p>
             <p>Once a document has been transcribed three times, it becomes 'done', no one else will be able to transcribe it after that.
@@ -13,13 +14,16 @@
 </div>
 <div class="dashProjList">
     {{=LEGEND(H2('My Projects'))}}
-    {{dash = True}}
+    {{  # Indicate to project list that we are on the dashboard
+        dash = True
+    }}
     {{include 'subviews/projectsList.html'}}
 </div>
 <br>
 <div class="dashTranscriptions">
 {{=LEGEND(H2('My Transcriptions'))}}
 {{
+        # Construct transcription table
         transTable = TABLE(THEAD(TR(TH('Content'), TH('State'), TH('Project'), TH('Document'))), _class='table table-striped')
         transTableContent = TBODY()
         for transcription in transcriptions:
