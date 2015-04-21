@@ -34,7 +34,11 @@
                             if request.vars.created is not None and project.title == request.vars.created:
                                 actionBtnClass += ' btn-success'
                             pass
-                            =A(actionText, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class=actionBtnClass)
+                            if project.totalDocs == project.compDocs:
+                                =SPAN(actionText, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class=actionBtnClass, _disabled=True, _title='You cannot open the project as all documents are done.')
+                            else:
+                                =A(actionText, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class=actionBtnClass)
+                            pass
                         else:
                             =SPAN(actionText, srContext, _href=URL(vars=dict(id=project.id, action=action)), _class=actionBtnClass, _disabled=True, _title='You cannot close the project until someone has made a transcription.')
                         pass
